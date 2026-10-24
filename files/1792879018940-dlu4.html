@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>프로필 카드 코드 메이커 v2</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f1f2f4;font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#222}
+  .wrap{display:flex;gap:24px;max-width:1120px;margin:0 auto;padding:24px 16px 60px;align-items:flex-start}
+  .col-preview{flex:0 0 460px;max-width:100%}
+  .col-tools{flex:1;min-width:0;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;padding-right:4px}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{font-size:12.5px;color:#777;margin:0 0 16px;line-height:1.6}
+  .stage{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;padding:0 0 4px}
+  .panel{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:14px 16px;margin-bottom:14px}
+  .panel h2{font-size:13px;margin:0 0 10px;color:#555}
+  .tb{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .tb button,.btn{border:1px solid #d5d8dd;background:#fafbfc;border-radius:8px;padding:6px 10px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .tb button:hover,.btn:hover{background:#eef0f3}
+  .btn.primary{background:#2d6cdf;color:#fff;border-color:#2d6cdf}
+  .btn.primary:hover{background:#2459b8}
+  .tb input[type=color]{width:32px;height:30px;padding:0;border:1px solid #d5d8dd;border-radius:8px;background:#fff;cursor:pointer}
+  .tb select{padding:6px;border-radius:8px;border:1px solid #d5d8dd;font-size:12.5px;font-family:inherit}
+  .sep{width:1px;height:22px;background:#e1e3e7;margin:0 2px}
+  .row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+  .row input[type=text],.row input[type=number]{flex:1;padding:8px 10px;border:1px solid #d5d8dd;border-radius:8px;font-size:13px;font-family:inherit;min-width:0}
+  textarea#code{width:100%;height:240px;border:1px solid #d5d8dd;border-radius:8px;padding:10px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;resize:vertical;background:#fbfbfc}
+  .hint{font-size:12px;color:#888;line-height:1.6;margin:8px 0 0}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#222;color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:99}
+  .toast.on{opacity:.92}
+
+  /* 카드 편집용 (출력 코드에는 포함되지 않음) */
+  #card [contenteditable]{outline:none}
+  #card [contenteditable]:focus{box-shadow:0 0 0 2px rgba(45,108,223,.35)}
+  .blk{position:relative}
+  .blk:hover{outline:1px dashed rgba(45,108,223,.5);outline-offset:-1px}
+  .ctl{position:absolute;top:4px;right:4px;z-index:5;display:none;gap:4px;background:rgba(0,0,0,.72);padding:3px;border-radius:6px;line-height:1.2}
+  .blk:hover>.ctl{display:flex}
+  .ctl button{border:0;background:#fff;color:#222;border-radius:4px;font-size:11px;padding:3px 6px;cursor:pointer;font-family:inherit}
+  .imgph{height:130px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:13px;background:#f4f5f7;line-height:1.4}
+  .entryx{display:none;cursor:pointer}
+  [data-role=entry]:hover .entryx{display:block}
+  [data-role=avatar]{cursor:pointer}
+  [data-role=avatar]:hover,[data-role=pimg]:hover,.imgph:hover{outline:2px solid #2d6cdf;outline-offset:-2px}
+  .imgph,[data-role=pimg]{cursor:pointer}
+
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100}
+  .modal .box{background:#fff;border-radius:12px;padding:18px;width:min(380px,92vw)}
+  .modal h3{margin:0 0 10px;font-size:14px}
+  @media(max-width:940px){.wrap{flex-direction:column}.col-preview{flex:none;width:100%}.col-tools{position:static;width:100%;max-height:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="col-preview">
+    <h1>카드 미리보기</h1>
+    <p class="sub">모든 글자를 직접 클릭해서 수정할 수 있어요. 블록 위에 마우스를 올리면 <b>↑ ↓ 삭제</b> 버튼이 나옵니다. <b>방명록의 캐릭터 칸(👫)이나 상단 이미지 칸을 클릭</b>하면 파일 업로드 또는 URL로 이미지를 넣을 수 있어요.</p>
+    <div class="stage">
+      <!-- ======= 카드 시작 (이 영역이 코드로 출력됩니다) ======= -->
+      <div id="card" style="width:100%;max-width:440px;margin:0 auto;background:#ffffff;color:#222222;font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;padding-bottom:24px;">
+        <div id="blocks"></div>
+      </div>
+      <!-- ======= 카드 끝 ======= -->
+    </div>
+  </div>
+
+  <div class="col-tools">
+
+    <div class="panel">
+      <h2>① 상단 이미지 (첫 번째 프로필 블록)</h2>
+      <div class="row">
+        <input type="text" id="imgUrl" placeholder="이미지 주소(URL)를 붙여넣기">
+        <button class="btn" id="imgApply">적용</button>
+      </div>
+      <div class="row" style="margin-bottom:0">
+        <input type="file" id="imgFile" accept="image/*" style="font-size:12.5px;flex:1;min-width:0">
+        <button class="btn" id="imgClear">제거</button>
+      </div>
+      <p class="hint">파일 업로드는 코드가 매우 길어져요. 실제 사용할 땐 이미지를 올린 뒤 <b>URL</b>로 넣는 걸 추천합니다.</p>
+    </div>
+
+    <div class="panel">
+      <h2>② 글자 서식 (먼저 글자를 드래그로 선택)</h2>
+      <div class="tb" id="toolbar">
+        <button data-cmd="bold"><b>B</b> 굵게</button>
+        <button data-cmd="italic"><i>I</i> 기울임</button>
+        <button data-cmd="underline"><u>U</u> 밑줄</button>
+        <button data-cmd="strikeThrough"><s>S</s> 취소선</button>
+        <button data-wrap="border-bottom:1.5px dotted #333333;">점선 밑줄</button>
+        <span class="sep"></span>
+        <button data-wrap="color:#d6246e;font-weight:700;font-style:italic;">핑크 강조</button>
+        <button data-wrap="color:#d6246e;font-weight:700;">닉네임 서식</button>
+        <button data-wrap="background:#fff176;font-weight:700;padding:1px 6px;">노랑 형광펜</button>
+        <button data-wrap="font-size:10.5px;color:#999999;">작은 회색</button>
+        <span class="sep"></span>
+        <label style="font-size:12.5px">글자색</label><input type="color" id="fgColor" value="#d6246e">
+        <label style="font-size:12.5px">배경색</label><input type="color" id="bgColor" value="#fff176">
+        <select id="sizeSel">
+          <option value="">크기</option>
+          <option>10</option><option>11</option><option>12</option><option>13</option>
+          <option>14</option><option>16</option><option>18</option><option>22</option><option>28</option>
+        </select>
+        <span class="sep"></span>
+        <button data-cmd="justifyLeft">왼쪽</button>
+        <button data-cmd="justifyCenter">가운데</button>
+        <button data-cmd="justifyRight">오른쪽</button>
+        <span class="sep"></span>
+        <button data-cmd="removeFormat">서식 지우기</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>③ 블록 추가 (맨 아래에 붙고, ↑↓로 순서를 옮겨요)</h2>
+      <div class="tb" id="addbar">
+        <button data-add="profile">+ 프로필(이미지+소개)</button>
+        <button data-add="chat">+ 메신저 창</button>
+        <button data-add="chatin">+ 메신저 창(입력칸 포함)</button>
+        <button data-add="guest">+ 미니홈피 방명록</button>
+        <button data-add="phone">+ 폰 문자 화면</button>
+        <button data-add="text">+ 텍스트</button>
+        <span class="sep"></span>
+        <button id="undoDel">삭제 되돌리기</button>
+      </div>
+      <div class="row" style="margin:12px 0 0">
+        <label style="font-size:12.5px;white-space:nowrap">카드 최대 폭(px)</label>
+        <input type="number" id="widthIn" value="440" min="280" max="800" step="10">
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>④ 완성된 HTML 코드</h2>
+      <textarea id="code" readonly spellcheck="false"></textarea>
+      <div class="row" style="margin:10px 0 0">
+        <button class="btn primary" id="copyBtn">코드 복사</button>
+        <button class="btn" id="dlBtn">HTML 파일로 저장</button>
+      </div>
+      <p class="hint">출력 코드는 전부 인라인 스타일이라 CSS를 따로 붙이지 않아도 돼요. (사이트에 따라 일부 스타일은 걸러질 수 있어요.)</p>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <h3 id="modalTitle">이미지 넣기</h3>
+    <div class="row"><input type="file" id="modalFile" accept="image/*" style="font-size:12.5px;flex:1;min-width:0"></div>
+    <div style="font-size:12px;color:#888;margin:0 0 8px;">또는 이미지 주소(URL)를 붙여넣고 [적용]</div>
+    <div class="row"><input type="text" id="modalInput" placeholder="https://..."></div>
+    <div class="row" style="justify-content:flex-end;margin:0">
+      <button class="btn" id="mReset">기본으로</button>
+      <button class="btn" id="mCancel">취소</button>
+      <button class="btn primary" id="mOk">적용</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const card = document.getElementById('card');
+  const blocks = document.getElementById('blocks');
+  const code = document.getElementById('code');
+  const toastEl = document.getElementById('toast');
+
+  document.execCommand('styleWithCSS', false, true);
+
+  function toast(msg){
+    toastEl.textContent = msg; toastEl.classList.add('on');
+    setTimeout(()=>toastEl.classList.remove('on'), 1700);
+  }
+
+  /* ---------- 템플릿 ---------- */
+  const NICK = 'ŁΓ구Ι엽ズΙ';
+  const nickLine = m => '<div><b style="color:#d6246e;">'+NICK+' :</b> '+m+'</div>';
+
+  function ctl(extra){
+    return '<div class="ctl" data-ui>'+(extra||'')+
+      '<button data-act="up">↑</button><button data-act="down">↓</button><button data-act="del">✕ 삭제</button></div>';
+  }
+  function block(type, html, extra){
+    const d = document.createElement('div');
+    d.className = 'blk'; d.dataset.type = type;
+    d.innerHTML = ctl(extra) + html;
+    return d;
+  }
+
+  function profileHTML(){
+    return '' +
+'<div data-role="imgbox" style="position:relative;line-height:0;">' +
+  '<img data-role="pimg" src="" alt="" style="width:100%;display:none;-webkit-mask-image:linear-gradient(#000 78%,transparent);mask-image:linear-gradient(#000 78%,transparent);">' +
+  '<div class="imgph" data-ui data-role="imgph">상단 이미지<br>(오른쪽 ① 패널에서 넣어요)</div>' +
+'</div>' +
+'<div style="padding:6px 22px 8px;">' +
+  '<div contenteditable="true" style="margin-top:4px;"><div><span style="font-size:28px;font-weight:800;letter-spacing:-0.5px;">임찬희</span> <span style="font-size:11px;color:#888888;">(24)</span></div></div>' +
+  '<div contenteditable="true" style="margin-top:6px;font-size:11px;color:#8a8a8a;line-height:2;">' +
+    '<div>성운대학교 체육학과 00학번 · 2학년</div><div>189cm · 83kg</div><div>7월 7일생 · 군필</div>' +
+  '</div>' +
+  '<div contenteditable="true" style="margin-top:26px;text-align:center;font-size:12.5px;color:#333333;line-height:2.2;word-break:keep-all;">' +
+    '<div>3녀 1남 집안의 귀하디귀한 막내아들로 태어나</div>' +
+    '<div><span style="font-weight:700;">「근육은 가보로 내려온다」</span>는 집안의 전통을 이어받으신 분.</div>' +
+    '<div><br></div>' +
+    '<div>돌잡이 때 축구공을 잡더니 4단 케이크까지 무너뜨렸다는</div>' +
+    '<div><span style="color:#d6246e;font-weight:700;font-style:italic;">★☆ 평택 임씨의 자랑 ★☆</span> ......되시겠다.</div>' +
+    '<div><span style="font-size:10.5px;color:#999999;">(*국가대표 누나들한테 맞으며 자란 건 안 비밀ㅋㅋ)</span></div>' +
+    '<div><br></div>' +
+    '<div>편견? 없음. 고정관념? 없음. 남한테 흥미?</div>' +
+    '<div><span style="font-weight:700;font-size:13.5px;">더더욱 없음!!!</span></div>' +
+    '<div><br></div>' +
+    '<div>공 차고 밥 먹고 잠자는 게 인생의 낙이며,</div>' +
+    '<div>사람 이름은 <span style="border-bottom:1.5px dotted #333333;">꼭 한 글자씩 틀려 부르는 게</span> 특기라나 뭐라나~ -_-;</div>' +
+    '<div><br></div>' +
+    '<div>타고난 넉살에 시원시원한 성격,</div>' +
+    '<div>친구는 또 어찌나 많은지 가는 곳마다 아는 사람 천지.</div>' +
+    '<div><br></div><div>·</div><div>·</div><div>·</div><div><br></div>' +
+    '<div>그런데 말입니다.</div><div>이 남자,</div><div><br></div>' +
+    '<div><span style="background:#fff176;font-weight:700;padding:1px 6px;">고백은 받는 족족 차 버린다......</span></div>' +
+  '</div>' +
+'</div>';
+  }
+
+  function chatHTML(lines, input){
+    return '' +
+'<div style="margin:16px 12px 0;border:1px solid #2b5fcc;background:#ffffff;">' +
+  '<div style="background:linear-gradient(#4b88e9,#2a62cf);padding:5px 8px;color:#ffffff;font-size:12px;font-weight:700;overflow:hidden;">' +
+    '<span style="float:right;font-weight:400;letter-spacing:4px;">_ ▢ ✕</span><span contenteditable="true">👥 뒤돌아서며</span>' +
+  '</div>' +
+  '<div style="padding:10px;">' +
+    '<div data-role="lines" contenteditable="true" style="background:#fffff0;border:1px solid #e6dfa6;padding:12px;font-size:12px;line-height:1.9;color:#222222;">' + lines.map(nickLine).join('') + '</div>' +
+    '<div contenteditable="true" style="margin-top:8px;background:#fdeeb0;border:1px solid #ecd682;padding:5px 8px;font-size:11px;color:#333333;">📌 😊▾ &nbsp;🖼 배경화면 &nbsp;💾 대화저장 &nbsp;❎ 닫기</div>' +
+    (input !== null ? '<div contenteditable="true" style="margin-top:8px;background:#efefe9;border:1px solid #dcdcd2;padding:8px 10px;font-size:12px;color:#666666;">'+input+'</div>' : '') +
+  '</div>' +
+'</div>';
+  }
+
+  function entryHTML(head, lines){
+    return '' +
+'<div data-role="entry" style="position:relative;border:1px solid #d9d9d9;margin-bottom:10px;">' +
+  '<span class="entryx" data-ui data-act="delentry" style="position:absolute;right:6px;top:3px;font-size:11px;color:#cc3333;">✕</span>' +
+  '<div contenteditable="true" style="background:#f0f0f0;border-bottom:1px solid #d9d9d9;padding:4px 22px 4px 8px;font-size:11px;color:#777777;">'+head+'</div>' +
+  '<table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;"><tr>' +
+    '<td style="width:66px;padding:8px;vertical-align:top;"><div data-role="avatar" title="클릭해서 이미지 넣기" style="width:50px;height:50px;border:1px solid #dddddd;background:#fafafa;text-align:center;line-height:50px;font-size:24px;overflow:hidden;">👫</div></td>' +
+    '<td contenteditable="true" style="padding:8px 8px 8px 0;vertical-align:top;font-size:12px;line-height:1.8;color:#222222;">' + lines.map(l=>'<div>'+l+'</div>').join('') + '</td>' +
+  '</tr></table>' +
+'</div>';
+  }
+
+  function guestHTML(){
+    return '' +
+'<div style="margin:16px 12px 0;border:2px solid #8ac4ee;border-radius:12px;padding:12px 14px 6px;background:#ffffff;">' +
+  '<div style="border-bottom:1px dotted #bbbbbb;padding-bottom:8px;margin-bottom:12px;overflow:hidden;">' +
+    '<span contenteditable="true" style="float:right;font-size:11px;color:#e8872a;">✦ 방명록 ✦</span>' +
+    '<span contenteditable="true" style="font-size:13px;font-weight:700;color:#3b4f7a;">임찬희ᴖᴖv 님의 미니홈피</span>' +
+  '</div>' +
+  '<div data-role="entries">' +
+    entryHTML('<b>NO.83</b> 돈없이ⓖㅋㅋガ (2004.04.11)', ['해덤고 F3 임찬히 폼 다죽엇니??ㅋㅋ','복학 기념으로 형님이 여소 한번 해줄텐게 연락하셈 ㅋㅋㅋ']) +
+    entryHTML('<b>NO.104</b> ᕕ그ㅣ얌 등ⓒ∽ (2004.06.06)', ['선배 저번 축구 완전 멋졌어요!! &gt;_&lt;','근데 제 이름 성해 아니구 성화예용...ㅡㅡ','맨날 까먹으시구~~ 저한테 관심 없으신가보당..ㅎㅠ']) +
+    entryHTML('<b>NO.132</b> 핑스ㅌΓ+ㅁ+ (2004.07.24)', ['아!!! 사람 이름 똑바로 부르란말야!!!ㅡㅡ','내가 노안이니?? 누님이라구 부르게??ㅋㅋ','이승기 성대모사루 넘어가면 다인줄 알어??ㅡㅡ^','개강하구 보자 임.찬.희 ㅡㅡ+']) +
+  '</div>' +
+'</div>';
+  }
+
+  function phoneHTML(){
+    return '' +
+'<div style="margin:20px auto 0;width:176px;">' +
+  '<div style="background:#1f1f24;border:2px solid #3b3b42;border-radius:22px;padding:10px 9px 8px;">' +
+    '<div style="height:14px;margin:0 4px 8px;font-size:8px;color:#8fc4f0;line-height:14px;letter-spacing:1px;">▂▃▅ ✉ 🔒 ▮▮▮▮</div>' +
+    '<div contenteditable="true" style="background:linear-gradient(#4a97ea,#2f78d2);color:#ffffff;font-weight:700;font-size:12px;padding:8px 9px;border-radius:12px 12px 0 0;">임찬희</div>' +
+    '<div contenteditable="true" style="background:#f6f8fd;height:150px;padding:56px 8px 0;text-align:center;font-size:13px;color:#222222;line-height:1.7;overflow:hidden;">저녁에 축구 ㄱ? ㅋㅋ</div>' +
+    '<div contenteditable="true" style="background:#1f1f24;color:#6cb7f5;font-size:10px;padding:11px 4px 3px;overflow:hidden;text-align:center;"><span style="float:left;">메뉴</span><span style="float:right;">목록</span><b style="color:#ffffff;">확인</b></div>' +
+  '</div>' +
+  '<div contenteditable="true" style="text-align:center;margin-top:22px;font-size:18px;font-weight:800;color:#e53935;">왜겠어</div>' +
+'</div>';
+  }
+
+  function textHTML(){
+    return '<div contenteditable="true" style="margin:16px 12px 0;text-align:center;font-size:12.5px;line-height:2.1;color:#333333;"><div>텍스트를 입력하세요</div></div>';
+  }
+
+  const LINEBTN = '<button data-act="addline">+ 줄</button>';
+  const makers = {
+    profile: () => block('profile', profileHTML()),
+    chat:    () => block('chat', chatHTML([ '내용을 입력하세요' ], null), LINEBTN),
+    chatin:  () => block('chat', chatHTML([ '내용을 입력하세요' ], '입력칸 문구'), LINEBTN),
+    guest:   () => block('guest', guestHTML(), '<button data-act="addentry">+ 방명록</button>'),
+    phone:   () => block('phone', phoneHTML()),
+    text:    () => block('text', textHTML())
+  };
+
+  function addDefaults(){
+    blocks.appendChild(makers.profile());
+    blocks.appendChild(block('chat', chatHTML([
+      '뭐? 찬희 오빠??',
+      '아!!! 딴 남자는 몰라도 그 오빠는 안된다구!!!ㅡㅡ',
+      '왜 안되나구?? 어휴...-_-',
+      '니가 직접 가서 그 오빠 방명록 한번 보구와바 ㅋㅋ'
+    ], '대체 어떻길래. . . ?'), LINEBTN));
+    blocks.appendChild(makers.guest());
+    blocks.appendChild(block('chat', chatHTML([
+      '봤지??ㅋㅋ 그 오빤 사람한테 관심이 하나두 없다니깐 ㅋㅋ',
+      '뭐 그래도 그렇게 궁금하다면야...',
+      '자 일단 함 들어봐!!'
+    ], null), LINEBTN));
+    blocks.appendChild(block('chat', chatHTML(['...왜나구???'], null), LINEBTN));
+    blocks.appendChild(makers.phone());
+  }
+
+  /* ---------- 코드 생성 ---------- */
+  function buildCode(){
+    const clone = card.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[data-ui]').forEach(e=>e.remove());
+    clone.querySelectorAll('[data-role="imgbox"]').forEach(b=>{
+      const i = b.querySelector('img');
+      if(!i || !i.getAttribute('src')) b.remove();
+    });
+    clone.querySelectorAll('*').forEach(el=>{
+      el.removeAttribute('contenteditable');
+      el.removeAttribute('class');
+      el.removeAttribute('title');
+      Array.from(el.attributes).forEach(a=>{ if(a.name.indexOf('data-')===0) el.removeAttribute(a.name); });
+    });
+    clone.querySelectorAll('img').forEach(i=>{ i.style.display = i.style.display==='none' ? 'block' : i.style.display; });
+    return clone.outerHTML.replace(/<\/(div|table|tr)>/g, '</$1>\n').trim();
+  }
+  function update(){ code.value = buildCode(); }
+
+  /* ---------- 서식 ---------- */
+  const inCard = r => card.contains(r.commonAncestorContainer);
+
+  function wrapSelection(style){
+    const sel = window.getSelection();
+    if(!sel.rangeCount || sel.isCollapsed){ toast('먼저 글자를 드래그로 선택해 주세요'); return; }
+    const r = sel.getRangeAt(0);
+    if(!inCard(r)){ toast('카드 안의 글자를 선택해 주세요'); return; }
+    const span = document.createElement('span');
+    span.style.cssText = style;
+    span.appendChild(r.extractContents());
+    r.insertNode(span);
+    sel.removeAllRanges();
+    const nr = document.createRange(); nr.selectNodeContents(span); sel.addRange(nr);
+    update();
+  }
+  function exec(cmd, val){
+    const sel = window.getSelection();
+    if(!sel.rangeCount || !inCard(sel.getRangeAt(0))){ toast('카드 안의 글자를 선택해 주세요'); return; }
+    document.execCommand(cmd, false, val || null);
+    update();
+  }
+
+  const toolbar = document.getElementById('toolbar');
+  toolbar.addEventListener('mousedown', e=>{
+    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') e.preventDefault();
+  });
+  toolbar.addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    if(b.dataset.cmd) exec(b.dataset.cmd);
+    else if(b.dataset.wrap) wrapSelection(b.dataset.wrap);
+  });
+
+  let saved = null;
+  document.addEventListener('selectionchange', ()=>{
+    const s = window.getSelection();
+    if(s.rangeCount && !s.isCollapsed && inCard(s.getRangeAt(0))) saved = s.getRangeAt(0).cloneRange();
+  });
+  function restore(){ if(!saved) return; const s = window.getSelection(); s.removeAllRanges(); s.addRange(saved); }
+  document.getElementById('fgColor').addEventListener('change', e=>{ restore(); exec('foreColor', e.target.value); });
+  document.getElementById('bgColor').addEventListener('change', e=>{ restore(); wrapSelection('background:'+e.target.value+';'); });
+  document.getElementById('sizeSel').addEventListener('change', e=>{
+    if(!e.target.value) return;
+    restore(); wrapSelection('font-size:'+e.target.value+'px;'); e.target.value = '';
+  });
+
+  /* ---------- 붙여넣기는 일반 텍스트로 ---------- */
+  card.addEventListener('paste', e=>{
+    e.preventDefault();
+    const t = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, t);
+  });
+
+  /* ---------- 블록 조작 ---------- */
+  let lastRemoved = null;
+  card.addEventListener('mousedown', e=>{ if(e.target.closest('[data-ui]')) e.preventDefault(); });
+  card.addEventListener('click', e=>{
+    const av = e.target.closest('[data-role="avatar"]');
+    if(av){ askUrl('캐릭터 이미지 넣기', v=>{ setAvatar(av, v); }, ()=>setAvatar(av,''), 112); return; }
+    const pim = e.target.closest('[data-role="pimg"], [data-role="imgph"]');
+    if(pim){
+      const target = pim.parentElement.querySelector('img[data-role="pimg"]');
+      askUrl('상단 이미지 넣기', v=>{ setImg(v, target); }, ()=>setImg('', target)); return;
+    }
+
+    const btn = e.target.closest('[data-act]'); if(!btn) return;
+    const act = btn.dataset.act;
+    const blk = btn.closest('.blk');
+
+    if(act === 'delentry'){
+      const en = btn.closest('[data-role="entry"]');
+      lastRemoved = { node: en, parent: en.parentNode, next: en.nextSibling };
+      en.remove(); update(); toast('항목을 삭제했어요 (③ 패널에서 되돌리기)'); return;
+    }
+    if(!blk) return;
+    if(act === 'up'){ const p = blk.previousElementSibling; if(p) blocks.insertBefore(blk, p); }
+    else if(act === 'down'){ const n = blk.nextElementSibling; if(n) blocks.insertBefore(n, blk); }
+    else if(act === 'del'){
+      lastRemoved = { node: blk, parent: blk.parentNode, next: blk.nextSibling };
+      blk.remove(); toast('블록을 삭제했어요 (③ 패널에서 되돌리기)');
+    }
+    else if(act === 'addline'){
+      const lines = blk.querySelector('[data-role="lines"]');
+      lines.insertAdjacentHTML('beforeend', nickLine('내용을 입력하세요'));
+    }
+    else if(act === 'addentry'){
+      blk.querySelector('[data-role="entries"]').insertAdjacentHTML('beforeend',
+        entryHTML('<b>NO.133</b> 닉네임 (2004.08.01)', ['내용을 입력하세요']));
+    }
+    update();
+  });
+
+  document.getElementById('undoDel').addEventListener('click', ()=>{
+    if(!lastRemoved){ toast('되돌릴 항목이 없어요'); return; }
+    lastRemoved.parent.insertBefore(lastRemoved.node, lastRemoved.next);
+    lastRemoved = null; update(); toast('되돌렸어요');
+  });
+
+  document.getElementById('addbar').addEventListener('click', e=>{
+    const b = e.target.closest('button[data-add]'); if(!b) return;
+    blocks.appendChild(makers[b.dataset.add]());
+    update();
+    blocks.lastElementChild.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+
+  document.getElementById('widthIn').addEventListener('input', e=>{
+    const v = Math.max(280, Math.min(800, parseInt(e.target.value,10) || 440));
+    card.style.maxWidth = v + 'px'; update();
+  });
+
+  /* ---------- 이미지 ---------- */
+  function setImg(src, el){
+    const pi = el || card.querySelector('img[data-role="pimg"]');
+    if(!pi){ toast('프로필 블록이 없어요'); return; }
+    const ph = pi.parentElement.querySelector('[data-role="imgph"]');
+    if(src){ pi.src = src; pi.style.display = 'block'; if(ph) ph.style.display = 'none'; }
+    else { pi.removeAttribute('src'); pi.style.display = 'none'; if(ph) ph.style.display = ''; }
+    update();
+  }
+  document.getElementById('imgApply').addEventListener('click', ()=>{
+    const v = document.getElementById('imgUrl').value.trim();
+    if(v) setImg(v); else toast('이미지 주소를 입력해 주세요');
+  });
+  document.getElementById('imgFile').addEventListener('change', e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const fr = new FileReader(); fr.onload = ()=>setImg(fr.result); fr.readAsDataURL(f);
+  });
+  document.getElementById('imgClear').addEventListener('click', ()=>{
+    document.getElementById('imgUrl').value=''; document.getElementById('imgFile').value=''; setImg('');
+  });
+
+  function setAvatar(av, url){
+    av.innerHTML = '';
+    if(url){
+      const im = document.createElement('img');
+      im.src = url; im.alt = '';
+      im.style.cssText = 'width:50px;height:50px;object-fit:cover;display:block;';
+      av.appendChild(im);
+    } else { av.textContent = '👫'; }
+    update();
+  }
+
+  /* ---------- 입력 모달 ---------- */
+  const modal = document.getElementById('modal');
+  const mInput = document.getElementById('modalInput');
+  const mFile = document.getElementById('modalFile');
+  let mOk = null, mReset = null, mMax = 0;
+  function askUrl(title, ok, reset, maxPx){
+    document.getElementById('modalTitle').textContent = title;
+    mInput.value = ''; mFile.value = ''; modal.style.display = 'flex';
+    mOk = ok; mReset = reset; mMax = maxPx || 0;
+  }
+  // 업로드한 이미지는 작게 줄여서 코드가 너무 길어지지 않게 함 (GIF는 원본 유지)
+  function fileToDataUrl(f, maxPx, cb){
+    const fr = new FileReader();
+    fr.onload = ()=>{
+      if(!maxPx || /gif$/i.test(f.type)){ cb(fr.result); return; }
+      const im = new Image();
+      im.onload = ()=>{
+        const k = Math.min(1, maxPx / Math.max(im.width, im.height));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        cb(c.toDataURL(/png|webp/i.test(f.type) ? 'image/png' : 'image/jpeg', 0.85));
+      };
+      im.onerror = ()=>cb(fr.result);
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(f);
+  }
+  mFile.addEventListener('change', ()=>{
+    const f = mFile.files[0]; if(!f) return;
+    fileToDataUrl(f, mMax, url=>{ closeModal(); if(mOk) mOk(url); });
+  });
+  function closeModal(){ modal.style.display = 'none'; }
+  document.getElementById('mCancel').addEventListener('click', closeModal);
+  document.getElementById('mOk').addEventListener('click', ()=>{
+    const v = mInput.value.trim(); closeModal(); if(v && mOk) mOk(v);
+  });
+  document.getElementById('mReset').addEventListener('click', ()=>{ closeModal(); if(mReset) mReset(); });
+  mInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') document.getElementById('mOk').click(); });
+
+  /* ---------- 복사 / 저장 ---------- */
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    update();
+    try{ await navigator.clipboard.writeText(code.value); }
+    catch(_){ code.select(); document.execCommand('copy'); }
+    toast('코드가 복사되었어요');
+  });
+  document.getElementById('dlBtn').addEventListener('click', ()=>{
+    update();
+    const full = '<!doctype html>\n<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>프로필 카드</title></head>\n<body style="margin:0;background:#ffffff;">\n' + code.value + '\n</body></html>';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([full], {type:'text/html'}));
+    a.download = 'profile-card.html'; a.click(); URL.revokeObjectURL(a.href);
+  });
+
+  card.addEventListener('input', update);
+
+  addDefaults();
+  update();
+})();
+</script>
+</body>
+</html>
