@@ -162,6 +162,7 @@ textarea.big,.wbd textarea{width:100%;min-height:300px;border:1px solid #8ea5c4;
 @media(max-width:820px){.cpf{grid-template-columns:1fr}}
 
 a.lk{text-decoration:none}
+.dot.away{background:#f2b27a}.dot.busy{background:#e0645a}.hgrid td{white-space:nowrap}.hgrid td.nm{white-space:normal}.hgrid th:first-child,.hgrid td:first-child{width:auto;text-align:left}.hgrid td.nm b{font-weight:bold}
 .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;padding-right:6px}.hgrid td,.hgrid th{padding-left:6px;padding-right:6px}
 @media(max-width:820px){.hgrid{grid-template-columns:1fr}}
 .lbw{width:min(780px,100%);max-height:100%;display:flex;flex-direction:column;background:#fff;border:1px solid #b3c3d9;border-radius:16px;box-shadow:0 8px 30px rgba(40,55,80,.4);overflow:hidden}
@@ -239,8 +240,8 @@ a.lk{text-decoration:none}
       </table>
       </div>
       <div id="homelist" style="display:none"><div class="hgrid">
-        <div><div class="sub" id="hf-t"></div><table><tr><th></th><th>이름</th><th style="width:70px">상태</th><th style="width:96px" id="hf-h"></th></tr><tbody id="hf-rows"></tbody></table></div>
-        <div><div class="sub" id="hr-t"></div><table><tr><th></th><th>이름</th><th style="width:70px">상태</th><th style="width:96px" id="hr-h"></th></tr><tbody id="hr-rows"></tbody></table></div>
+        <div><div class="sub" id="hf-t"></div><table><tr><th style="padding-left:14px">이름</th><th style="width:96px">상태</th><th style="width:110px" id="hf-h"></th></tr><tbody id="hf-rows"></tbody></table></div>
+        <div><div class="sub" id="hr-t"></div><table><tr><th style="padding-left:14px">보낸 사람</th><th style="width:96px">상태</th></tr><tbody id="hr-rows"></tbody></table></div>
       </div></div>
       </div>
 
@@ -369,7 +370,7 @@ var DEF={
  music:{url:'',label:'지금 듣는 음악',artist:'임찬희',volume:60,loop:false,cover:''},
  links:[{t:'미니홈피 바로가기',u:'#mini'},{t:'새 대화 시작하기',u:'#keep'}],
  chat:{l:{name:'임찬희',img:''},r:{name:'선유이',img:''},msgs:[{s:'r',t:'자니?'},{s:'l',t:'아니, 안 자.'},{s:'l',t:'왜 불렀어?'},{s:'r',t:'그냥 불러봤어 ㅎㅎ'}]},
- home:{label:'홈',banner:{img:'',title:'onnate',sub:'임찬희',w:84,cover:false},friends:{title:'친구목록',head:'한마디',items:[{n:'임찬희',s:1,t:'온라인'},{n:'선유이',s:1,t:'온라인'}]},recent:{title:'최근 대화',head:'시간',items:[{n:'임찬희',s:1,t:'오늘 오후 11:42'},{n:'선유이 님과의 대화',s:1,t:'오늘 오후 09:10'},{n:'쪽지 보관함 알림',s:0,t:'어제 오후 10:05'},{n:'미니홈피 방명록 알림',s:0,t:'2026.10.23'},{n:'대화 보관 · 첫 대화',s:0,t:'2026.04.22'}]}},
+ home:{label:'홈',banner:{img:'',title:'onnate',sub:'임찬희',w:84,cover:false},friends:{title:'친구목록',head:'한마디',items:[{n:'임찬희',s:'on',t:''},{n:'선유이',s:'on',t:''}]},notes:{title:'쪽지',items:[{n:'임찬희',r:0},{n:'선유이',r:1},{n:'임찬희',r:1}]}},
  album:[],
  pages:{f1:'여기는 임찬희 페이지예요.',f2:'여기는 선유이 페이지예요.',rel:'여기는 우리 사이 페이지예요.'}};
 var DATA=JSON.parse(JSON.stringify(DEF)), CFG={};
@@ -377,7 +378,7 @@ try{CFG=JSON.parse(localStorage.getItem('onnate_gh')||'{}');}catch(e){}
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function fmt(t){t=String(t||'');if(/<(div|style|table|section|center|span|a|p|font)\b/i.test(t)&&/<\/(div|style|table|section|center|span|a|p|font)>/i.test(t))return t;return String(t||'').split(/\n\s*\n/).map(function(c){c=c.trim();if(!c)return '';return /^<(div|blockquote|h\d|ul|ol|hr|img|table|p|figure|section)/i.test(c)?c:'<p>'+c.replace(/\n/g,'<br>')+'</p>';}).join('');}
-function normHome(h){h=h||{};var d=JSON.parse(JSON.stringify(DEF.home));return {label:h.label!=null?h.label:d.label,banner:Object.assign(d.banner,h.banner||{}),friends:Object.assign(d.friends,h.friends||{}),recent:Object.assign(d.recent,h.recent||{})};}
+function normHome(h){h=h||{};var d=JSON.parse(JSON.stringify(DEF.home));return {label:h.label!=null?h.label:d.label,banner:Object.assign(d.banner,h.banner||{}),friends:Object.assign(d.friends,h.friends||{}),notes:Object.assign(d.notes,h.notes||{})};}
 function norm(j){return {home:normHome(j.home),ticker:Object.assign({},DEF.ticker,j.ticker||{}),dday:Object.assign({},DEF.dday,j.dday||{}),sched:j.sched||JSON.parse(JSON.stringify(DEF.sched)),profile:Object.assign(JSON.parse(JSON.stringify(DEF.profile)),j.profile||{}),music:Object.assign({},DEF.music,j.music||{}),links:j.links||JSON.parse(JSON.stringify(DEF.links)),chat:j.chat||JSON.parse(JSON.stringify(DEF.chat)),posts:j.posts||[],album:j.album||[],pages:Object.assign({},DEF.pages,j.pages||{})};}
 
 /* ===== 화면 그리기 ===== */
@@ -530,9 +531,16 @@ function renderLeft(){ renderTicker();
   $('sc-l').innerHTML=h||'<div class="none">예정된 일정이 없어요.</div>';
 }
 var BNDEF=(document.querySelector('#bn-img')||{}).src||'';
-function hrows(items,tb){
-  tb.innerHTML=(items||[]).map(function(r){ return '<tr class="row"><td><i class="cb"></i></td><td>'+esc(r.n)+'</td><td><i class="dot'+(+r.s?' on':'')+'"></i>'+(+r.s?'온라인':'오프라인')+'</td><td style="color:#7b8aa0">'+esc(r.t)+'</td></tr>'; }).join('')||'<tr class="empty"><td colspan="4">비어 있어요.</td></tr>';
-  [].forEach.call(tb.querySelectorAll('tr.row'),function(r){ r.addEventListener('click',function(){ [].forEach.call(tb.querySelectorAll('tr.row'),function(m){m.classList.remove('sel');}); r.classList.add('sel'); }); });
+var ST={on:['온라인',''],away:['자리비움',' away'],busy:['다른 용무중',' busy'],off:['오프라인',' off']};
+function stKey(v){ v=String(v); return v==='1'?'on':v==='0'?'off':(ST[v]?v:'on'); }
+function hsel(tb){ [].forEach.call(tb.querySelectorAll('tr.row'),function(r){ r.addEventListener('click',function(){ [].forEach.call(tb.querySelectorAll('tr.row'),function(m){m.classList.remove('sel');}); r.classList.add('sel'); }); }); }
+function frows(items,tb){
+  tb.innerHTML=(items||[]).map(function(r){ var k=stKey(r.s), d=ST[k]; return '<tr class="row"><td class="nm" style="padding-left:14px">'+esc(r.n)+'</td><td><i class="dot'+(k==='on'?' on':d[1])+'"></i>'+d[0]+'</td><td style="color:#7b8aa0">'+esc(r.t||'')+'</td></tr>'; }).join('')||'<tr class="empty"><td colspan="3">비어 있어요.</td></tr>';
+  hsel(tb);
+}
+function nrows(items,tb){
+  tb.innerHTML=(items||[]).map(function(r){ var rd=+r.r; return '<tr class="row"><td class="nm" style="padding-left:14px">'+(rd?esc(r.n):'<b>'+esc(r.n)+'</b>')+'</td><td><i class="dot'+(rd?'':' on')+'"></i>'+(rd?'읽음':'<b style="color:#3f6aa8">읽지 않음</b>')+'</td></tr>'; }).join('')||'<tr class="empty"><td colspan="2">쪽지가 없어요.</td></tr>';
+  hsel(tb);
 }
 function renderHome(){
   var H=DATA.home, B=H.banner, ban=$('ban'), im=$('bn-img'), bt=$('bn-t'), bs=$('bn-s');
@@ -545,8 +553,8 @@ function renderHome(){
     bt.textContent=B.title||''; bt.style.display=B.title?'':'none'; bs.textContent=B.sub||''; bs.style.display=B.sub?'':'none';
   }
   $('hf-t').textContent='● '+(H.friends.title||''); $('hf-h').textContent=H.friends.head||'';
-  $('hr-t').textContent='● '+(H.recent.title||''); $('hr-h').textContent=H.recent.head||'';
-  hrows(H.friends.items,$('hf-rows')); hrows(H.recent.items,$('hr-rows'));
+  $('hr-t').textContent='● '+(H.notes.title||'');
+  frows(H.friends.items,$('hf-rows')); nrows(H.notes.items,$('hr-rows'));
 }
 function renderAll(){ renderHome(); renderSide(); renderLeft(); chatHead(); ['f1','f2','rel'].forEach(function(k){ $('pg-'+k).innerHTML=fmt(DATA.pages[k]); }); renderBoard(); renderAlbum(); }
 
@@ -664,35 +672,38 @@ PAN.set=function(){
 };
 PAN.home=function(){
   var W=JSON.parse(JSON.stringify(DATA.home));
+  W.friends.items.forEach(function(r){ r.s=stKey(r.s); });
   function draw(){
-    var B=W.banner, h='<h3>홈 화면</h3><p class="hint">왼쪽 메뉴 이름, 가운데 배너(이미지·글자), 그리고 아래 「친구목록」「최근 대화」 두 칸을 여기서 고칠 수 있어요. 고친 뒤 꼭 저장을 눌러 주세요.</p>'
+    var B=W.banner, h='<h3>홈 화면</h3><p class="hint">왼쪽 메뉴 이름, 가운데 배너(이미지·글자), 그리고 아래 「친구목록」「쪽지」 두 칸을 여기서 고칠 수 있어요. 고친 뒤 꼭 저장을 눌러 주세요.</p>'
      +'<label>왼쪽 메뉴 이름</label><input id="hm-lb" value="'+esc(W.label)+'">'
      +'<label>가운데 배너 이미지 (비우면 기본 온네이트 그림)</label><div class="cpf one"><div><img src="'+esc(B.img||BNDEF)+'" alt="" style="border-radius:8px;width:auto;max-width:100%;height:70px"><div class="btns" style="margin:8px 0 0"><input type="file" accept="image/*" id="hm-f" style="width:auto"><button class="bt" id="hm-u">이미지 올리기</button><button class="bt" id="hm-x">기본으로</button></div></div></div>'
      +'<label style="font-weight:normal"><input type="checkbox" id="hm-cv" style="width:auto;height:auto"'+(B.cover?' checked':'')+'> 이미지를 배너 전체에 꽉 채우기 (글자는 숨겨져요)</label>'
      +'<label>이미지 너비 (px, 꽉 채우기가 아닐 때)</label><input id="hm-w" value="'+esc(B.w)+'" style="width:100px">'
      +'<label>배너 큰 글자 (비워도 돼요)</label><input id="hm-bt" value="'+esc(B.title)+'">'
      +'<label>배너 작은 글자 (비워도 돼요)</label><input id="hm-bs" value="'+esc(B.sub)+'">';
-    [['friends','친구목록'],['recent','최근 대화']].forEach(function(x){ var g=W[x[0]];
-      h+='<hr style="border:0;border-top:1px dashed #cdd8e8;margin:16px 0"><h3>'+x[1]+' 칸</h3><div class="crow"><input id="'+x[0]+'-t" value="'+esc(g.title)+'" placeholder="칸 제목"><input id="'+x[0]+'-h" value="'+esc(g.head)+'" placeholder="맨 오른쪽 열 이름" style="max-width:150px"></div>';
-      g.items.forEach(function(r,i){ h+='<div class="crow"><input data-g="'+x[0]+'" data-i="'+i+'" data-f="n" value="'+esc(r.n)+'" placeholder="이름"><select data-g="'+x[0]+'" data-i="'+i+'" data-f="s"><option value="1"'+(+r.s?' selected':'')+'>온라인</option><option value="0"'+(+r.s?'':' selected')+'>오프라인</option></select><input data-g="'+x[0]+'" data-i="'+i+'" data-f="t" value="'+esc(r.t)+'" placeholder="시간·한마디" style="max-width:150px"><button class="bt" data-up="'+x[0]+':'+i+'">↑</button><button class="bt" data-dn="'+x[0]+':'+i+'">↓</button><button class="bt" data-rm="'+x[0]+':'+i+'">✕</button></div>'; });
-      h+='<div class="btns"><button class="bt" data-add="'+x[0]+'">+ 줄 추가</button></div>'; });
+    h+='<hr style="border:0;border-top:1px dashed #cdd8e8;margin:16px 0"><h3>친구목록 칸</h3><p class="hint">상태는 온라인 · 자리비움 · 다른 용무중 · 오프라인 중에서 골라요. 한마디는 비워도 돼요.</p><div class="crow"><input id="friends-t" value="'+esc(W.friends.title)+'" placeholder="칸 제목"><input id="friends-h" value="'+esc(W.friends.head)+'" placeholder="맨 오른쪽 열 이름" style="max-width:150px"></div>';
+    W.friends.items.forEach(function(r,i){ h+='<div class="crow"><input data-g="friends" data-i="'+i+'" data-f="n" value="'+esc(r.n)+'" placeholder="이름"><select data-g="friends" data-i="'+i+'" data-f="s">'+['on','away','busy','off'].map(function(k){ return '<option value="'+k+'"'+(r.s===k?' selected':'')+'>'+ST[k][0]+'</option>'; }).join('')+'</select><input data-g="friends" data-i="'+i+'" data-f="t" value="'+esc(r.t||'')+'" placeholder="한마디" style="max-width:150px"><button class="bt" data-up="friends:'+i+'">↑</button><button class="bt" data-dn="friends:'+i+'">↓</button><button class="bt" data-rm="friends:'+i+'">✕</button></div>'; });
+    h+='<div class="btns"><button class="bt" data-add="friends">+ 친구 추가</button></div>';
+    h+='<hr style="border:0;border-top:1px dashed #cdd8e8;margin:16px 0"><h3>쪽지 칸</h3><p class="hint">누구에게서 왔는지 이름을 적고, 읽음 / 읽지 않음을 골라요.</p><div class="crow"><input id="notes-t" value="'+esc(W.notes.title)+'" placeholder="칸 제목"></div>';
+    W.notes.items.forEach(function(r,i){ h+='<div class="crow"><input data-g="notes" data-i="'+i+'" data-f="n" value="'+esc(r.n)+'" placeholder="보낸 사람"><select data-g="notes" data-i="'+i+'" data-f="r"><option value="0"'+(+r.r?'':' selected')+'>읽지 않음</option><option value="1"'+(+r.r?' selected':'')+'>읽음</option></select><button class="bt" data-up="notes:'+i+'">↑</button><button class="bt" data-dn="notes:'+i+'">↓</button><button class="bt" data-rm="notes:'+i+'">✕</button></div>'; });
+    h+='<div class="btns"><button class="bt" data-add="notes">+ 쪽지 추가</button></div>';
     h+='<div class="btns"><span class="sp"></span><button class="bt p" id="hm-sv" style="min-width:110px">저장 (GitHub)</button></div>';
     $('apanel').innerHTML=h; bind();
   }
   function sync(){ var p=$('apanel'), B=W.banner;
     W.label=$('hm-lb').value; B.cover=$('hm-cv').checked; B.w=$('hm-w').value; B.title=$('hm-bt').value; B.sub=$('hm-bs').value;
-    ['friends','recent'].forEach(function(k){ W[k].title=$(k+'-t').value; W[k].head=$(k+'-h').value; });
-    [].forEach.call(p.querySelectorAll('[data-g]'),function(e){ var f=e.getAttribute('data-f'); W[e.getAttribute('data-g')].items[+e.getAttribute('data-i')][f]=(f==='s'?+e.value:e.value); }); }
+    W.friends.title=$('friends-t').value; W.friends.head=$('friends-h').value; W.notes.title=$('notes-t').value;
+    [].forEach.call(p.querySelectorAll('[data-g]'),function(e){ var f=e.getAttribute('data-f'); W[e.getAttribute('data-g')].items[+e.getAttribute('data-i')][f]=(f==='r'?+e.value:e.value); }); }
   function bind(){ var p=$('apanel');
     function on(sel,fn){ [].forEach.call(p.querySelectorAll(sel),function(b){ b.onclick=function(){ sync(); fn(b); }; }); }
     function sp(b,a){ var x=b.getAttribute(a).split(':'); return [x[0],+x[1]]; }
     on('[data-up]',function(b){ var z=sp(b,'data-up'),L=W[z[0]].items; if(z[1]>0){ var t=L[z[1]]; L[z[1]]=L[z[1]-1]; L[z[1]-1]=t; draw(); } });
     on('[data-dn]',function(b){ var z=sp(b,'data-dn'),L=W[z[0]].items; if(z[1]<L.length-1){ var t=L[z[1]]; L[z[1]]=L[z[1]+1]; L[z[1]+1]=t; draw(); } });
     on('[data-rm]',function(b){ var z=sp(b,'data-rm'); W[z[0]].items.splice(z[1],1); draw(); });
-    on('[data-add]',function(b){ W[b.getAttribute('data-add')].items.push({n:'',s:1,t:''}); draw(); });
+    on('[data-add]',function(b){ var k=b.getAttribute('data-add'); W[k].items.push(k==='friends'?{n:'',s:'on',t:''}:{n:'',r:0}); draw(); });
     $('hm-u').onclick=function(){ sync(); var f=$('hm-f').files[0]; if(!f){ msg('이미지를 먼저 골라 주세요.',1); return; } if(!needCfg()) return; msg('이미지 올리는 중…'); upImg(f).then(function(path){ W.banner.img=path; msg('올렸어요. 아래에서 저장을 눌러 주세요.'); draw(); },function(e){ msg('올리기 실패: '+explain(e),1); }); };
     $('hm-x').onclick=function(){ sync(); W.banner.img=''; draw(); };
-    $('hm-sv').onclick=function(){ sync(); ['friends','recent'].forEach(function(k){ W[k].items=W[k].items.filter(function(r){ return String(r.n).trim(); }); }); var old=DATA.home; DATA.home=JSON.parse(JSON.stringify(W)); save('홈 수정').then(function(ok){ if(!ok) DATA.home=old; }); };
+    $('hm-sv').onclick=function(){ sync(); ['friends','notes'].forEach(function(k){ W[k].items=W[k].items.filter(function(r){ return String(r.n).trim(); }); }); var old=DATA.home; DATA.home=JSON.parse(JSON.stringify(W)); save('홈 수정').then(function(ok){ if(!ok) DATA.home=old; }); };
   }
   draw();
 };
