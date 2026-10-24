@@ -1,5 +1,4 @@
 {
- "posts": [],
  "ticker": {
   "count": "ⓒ noxuelux",
   "text": "♡ chanhee yui 님이 접속했어요.",
@@ -8,10 +7,9 @@
  "dday": {
   "label": "ONNATE",
   "title": "우리가 함께한 지",
-  "date": "2026-04-22",
-  "first": true,
-  "sub": "",
-  "milestone": true
+  "date": "2026-10-01",
+  "first": false,
+  "sub": "바보!"
  },
  "sched": {
   "title": "성운대학교 학과 일정",
@@ -102,6 +100,7 @@
    }
   ]
  },
+ "posts": [],
  "album": [
   {
    "f": "album-1.jpg",
