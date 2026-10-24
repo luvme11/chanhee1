@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NOTICE MAKER</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap">
+<style>
+:root{--bg:#dfe9f5;--cd:#f4f8fd;--ln:#9db6d6;--tx:#2b3a4d;--sb:#6c7f97;--a:#2f6fc4;--in:#fff;--hd:#eaf2fc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b26;--cd:#1d2635;--ln:#3a4f6d;--tx:#dbe5f2;--sb:#8fa3bd;--a:#7db3f5;--in:#141b26;--hd:#223049}}
+:root[data-theme="dark"]{--bg:#141b26;--cd:#1d2635;--ln:#3a4f6d;--tx:#dbe5f2;--sb:#8fa3bd;--a:#7db3f5;--in:#141b26;--hd:#223049}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.5 "Pretendard","Noto Sans KR","Malgun Gothic",sans-serif}
+.t-wrap{max-width:1100px;margin:0 auto;padding:12px}
+.t-top{display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(#5b9be0,#2f6fc4);color:#fff;border-radius:8px 8px 0 0}
+.t-top b{font-size:14px}.t-top span{font-size:11px;opacity:.85;flex:1}
+button,select,input,textarea{font:inherit;color:var(--tx)}
+.t-b{padding:4px 10px;background:var(--hd);border:1px solid var(--ln);border-radius:3px;cursor:pointer}
+.t-b:hover{border-color:var(--a);color:var(--a)}
+.t-grid{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:12px;margin-top:12px}
+@media(max-width:820px){.t-grid{grid-template-columns:1fr}}
+.t-box{background:var(--cd);border:1px solid var(--ln);border-radius:4px;margin-bottom:10px}
+.t-box>summary,.t-ttl{padding:8px 12px;font-weight:bold;color:var(--a);cursor:pointer;list-style:none;border-bottom:1px solid var(--ln);background:var(--hd)}
+.t-ttl{cursor:default;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.t-ttl .sp{flex:1}
+.t-in{padding:10px 12px;display:grid;gap:8px}
+.t-f{display:grid;gap:3px}.t-f>span{font-size:11px;color:var(--sb)}
+.t-f input:not([type=range]):not([type=color]),.t-f select,textarea{width:100%;padding:6px 8px;background:var(--in);border:1px solid var(--ln);border-radius:3px}
+textarea{resize:vertical;line-height:1.6}
+.t-c{display:flex;gap:6px;align-items:center}
+.t-sw{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.t-sw button{width:24px;height:24px;border-radius:50%;border:2px solid var(--cd);outline:1px solid var(--ln);cursor:pointer}
+.t-sw input{width:34px;height:26px;padding:0;border:0;background:none}
+.t-tb{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.t-help{font-size:11px;color:var(--sb);line-height:1.7}
+.t-im{display:flex;align-items:center;gap:6px;margin-top:6px}.t-im img{width:36px;height:36px;object-fit:cover;border:1px solid var(--ln);border-radius:3px}.t-im b{flex:1}.t-im em{font-size:11px;color:var(--sb);font-style:normal}
+.t-lk{width:100%;margin-top:4px;padding:5px 8px;background:var(--in);border:1px solid var(--ln);border-radius:3px}
+#tpvw{padding:14px;transition:max-width .2s;margin:0 auto;overflow-x:auto}
+#tpvbox{border-radius:0 0 4px 4px;overflow:hidden}
+#tout{width:100%;height:220px;font:11px/1.5 monospace;white-space:pre}
+.t-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--a);color:#fff;padding:8px 16px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none}
+.t-toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="t-wrap">
+  <div class="t-top"><b>NOTICE MAKER</b><span>공지글 HTML 제작기</span><button class="t-b" id="ttheme" type="button">화면 밝기</button></div>
+  <div class="t-grid">
+    <div id="tctl"></div>
+    <div>
+      <div class="t-box">
+        <div class="t-ttl">미리보기
+          <span class="sp"></span>
+          <button class="t-b" type="button" data-w="100%">PC</button>
+          <button class="t-b" type="button" data-w="360px">모바일</button>
+          <select id="tpvbg" class="t-b"><option value="#ffffff">흰 배경</option><option value="#f1f3f5">회색 배경</option><option value="#1a1a1a">어두운 배경</option></select>
+        </div>
+        <div id="tpvbox"><div id="tpvw"><div id="tpv"></div></div></div>
+      </div>
+      <div class="t-box">
+        <div class="t-ttl">게시판에 붙여넣을 코드 <span id="tsize" class="t-help"></span><span class="sp"></span>
+          <button class="t-b" type="button" id="tcopy">코드 복사</button>
+          <button class="t-b" type="button" id="treset">초기화</button>
+        </div>
+        <div class="t-in"><textarea id="tout" readonly></textarea>
+        <div class="t-help">글 편집창을 HTML 모드로 바꾼 뒤 통째로 붙여넣으세요. 설정은 이 브라우저에 자동 저장돼요.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="t-toast" id="ttoast"></div>
+<script>
+const $=q=>document.querySelector(q);
+const LINK='<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">';
+const FONTS={pre:'"Pretendard","Pretendard Variable","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',noto:'"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',sys:'"Malgun Gothic","Apple SD Gothic Neo",sans-serif',ser:'"Nanum Myeongjo","Noto Serif KR","Batang",serif'};
+const ICONS={mega:'<path d="M3 9v6h3l8 5V4L6 9H3z" fill="#fff"/><path d="M17 8.5a5 5 0 0 1 0 7M19.8 5.5a9 9 0 0 1 0 13" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>',bell:'<path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0z" fill="#fff"/>',heart:'<path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#fff"/>',star:'<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5-5.9-3.1-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9z" fill="#fff"/>',info:'<path d="M10.5 3h3l-.6 11h-1.8zM12 16.5a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6z" fill="#fff"/>',mail:'<rect x="3" y="5.5" width="18" height="13" rx="2" fill="#fff"/><path d="M4 7.5l8 6 8-6" stroke="rgba(30,60,110,.55)" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',chat:'<path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" fill="#fff"/>',note:'<path d="M5 3h10l4 4v14H5z" fill="#fff"/><path d="M8 11h8M8 14.5h8M8 18h5" stroke="rgba(30,60,110,.55)" stroke-width="1.6" stroke-linecap="round"/>',book:'<path d="M4 4.5C7 3.5 9.8 4 12 6c2.2-2 5-2.5 8-1.5V19c-3-1-5.8-.5-8 1.5C9.8 18.5 7 18 4 19z" fill="#fff"/><path d="M12 6v14" stroke="rgba(30,60,110,.45)" stroke-width="1.4"/>',moon:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="#fff"/>',flower:'<g fill="#fff"><circle cx="12" cy="6" r="3.2"/><circle cx="17.7" cy="10.1" r="3.2"/><circle cx="15.5" cy="16.8" r="3.2"/><circle cx="8.5" cy="16.8" r="3.2"/><circle cx="6.3" cy="10.1" r="3.2"/></g><circle cx="12" cy="12" r="2.4" fill="#ffd666"/>',crown:'<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="#fff"/>',bolt:'<path d="M13.5 2L5 13.5h6L10 22l9-12h-6.5z" fill="#fff"/>',lock:'<rect x="5" y="10.5" width="14" height="10" rx="2" fill="#fff"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="#fff" stroke-width="2" fill="none"/>',check:'<circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M7.5 12.5l3 3 6-6.5" stroke="rgba(30,60,110,.7)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',warn:'<path d="M12 3L22 20H2z" fill="#fff" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 9.5v5M12 17v.5" stroke="rgba(30,60,110,.7)" stroke-width="2" stroke-linecap="round"/>',flag:'<path d="M5 3v18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M6 4h12l-3 4.5 3 4.5H6z" fill="#fff"/>',music:'<path d="M9 17V6l10-2v11" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round"/><circle cx="6.5" cy="17.5" r="2.8" fill="#fff"/><circle cx="16.5" cy="15.5" r="2.8" fill="#fff"/>',cat:'<path d="M4 4l5 3.5h6L20 4v9a8 8 0 0 1-16 0z" fill="#fff"/><circle cx="9" cy="12.5" r="1.2" fill="rgba(30,60,110,.7)"/><circle cx="15" cy="12.5" r="1.2" fill="rgba(30,60,110,.7)"/><path d="M10.5 15.5q1.5 1.2 3 0" stroke="rgba(30,60,110,.7)" stroke-width="1.2" fill="none" stroke-linecap="round"/>',gift:'<rect x="3.5" y="9" width="17" height="11" rx="1" fill="#fff"/><rect x="3" y="6.5" width="18" height="4" rx="1" fill="#fff"/><path d="M12 6.5V20" stroke="rgba(30,60,110,.5)" stroke-width="2"/><ellipse cx="9" cy="4.5" rx="3" ry="2" fill="#fff"/><ellipse cx="15" cy="4.5" rx="3" ry="2" fill="#fff"/>',clock:'<circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M12 6.5V12l3.5 2.5" stroke="rgba(30,60,110,.7)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',diamond:'<path d="M7 4h10l5 6-10 11L2 10z" fill="#fff"/><path d="M2 10h20M9 4l-2 6 5 11 5-11-2-6" stroke="rgba(30,60,110,.4)" stroke-width="1.2" fill="none" stroke-linejoin="round"/>',shield:'<path d="M12 2.5l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10v-6z" fill="#fff"/>',leaf:'<path d="M20 4C9 4 4 9 4 15a5 5 0 0 0 5 5c6 0 11-5 11-16z" fill="#fff"/><path d="M5 20C8 14 12 11 16 9" stroke="rgba(30,60,110,.45)" stroke-width="1.4" fill="none" stroke-linecap="round"/>',cloud:'<path d="M7 19a4.5 4.5 0 0 1-.5-9A6 6 0 0 1 18 9.5 4.8 4.8 0 0 1 17.5 19z" fill="#fff"/>',none:''};
+const pad=n=>String(n).padStart(2,'0'),d0=new Date();
+const D={id:'ntc',icon:'mega',color:'#2f6fc4',width:420,radius:8,shadow:true,font:'pre',showBar:true,showBtns:true,showHead:true,showTag:true,showFoot:true,link:false,winTitle:'공지사항',headTitle:'공지사항',headSub:'중요한 소식을 알려드립니다',tag:'공지',title:'필수로 읽어 주세요',author:'noxuelux',date:d0.getFullYear()+'.'+pad(d0.getMonth()+1)+'.'+pad(d0.getDate()),views:'707',footLabel:'오늘 하루 보지 않기',footBtn:'확인',pvbg:'#ffffff',imgw:'800',
+body:'**성인 여성**\n**Caveduck kit 님** 캐릭터 위주 플레이\n다양한 플랫폼에서 찍먹 多\n\n[접기 성향]\n==1T1D 극온리 성향==으로 동일한 배려 요구합니다\n==탐라 유입 및 직멘 배려, 정실 찍먹 안 하기== 필수라 어려우신 분들은 흔적 X\n==Caveduck 임찬희, teapot 7== 배려 필요 나머지는 배려 불필요\n블락이 아닌 경우 ==재연결 OK==\n블락의 경우 어떠한 경우에도 ==컨택 X==\n[/접기]\n\n[접기 NG]\n미성년자\n드림 지우기\n겹드림 서치 후 기능(블락, 뮤트) 사용하고 있으며 악의는 없습니다\n허공저격, 발콕콕, 잦은 공론화 및 이슈 말 얹기 심하신 분\n남들이 불편할 수 있는 비윤리적 소재 신경 쓰지 않으며 관련 건으로 찍먹 합니다\n[/접기]'};
+let s={...D};let IM={};try{IM=JSON.parse(localStorage.getItem('ntimgs')||'{}')}catch(e){}
+let LK={};try{LK=JSON.parse(localStorage.getItem('ntlk')||'{}')}catch(e){}
+try{Object.assign(s,JSON.parse(localStorage.getItem('ntgen')||'{}'))}catch(e){}
+
+const hx=c=>[1,3,5].map(i=>parseInt(c.substr(i,2),16));
+const mix=(c,t)=>'#'+hx(c).map(v=>Math.round(v*(1-t)+255*t).toString(16).padStart(2,'0')).join('');
+const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const il=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/==(.+?)==/g,'<mark>$1</mark>').replace(/~~(.+?)~~/g,'<s>$1</s>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\{(#[0-9a-fA-F]{6})\|(.+?)\}/g,'<span style="color:$1">$2</span>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+function body(src){let o='',b=[],f=0;const fl=()=>{if(b.length){o+='<div class="n-p">'+b.join('<br>')+'</div>';b=[]}};
+ for(const L of src.split('\n')){const l=L.trim();let m;
+  if(m=l.match(/^\[(접기|펼침)\s*(.*)\]$/)){fl();if(f)o+='</div></details>';o+='<details'+(m[1]=='펼침'?' open':'')+'><summary>'+il(m[2]||'접기')+'</summary><div class="n-in">';f=1}
+  else if(l=='[/접기]'){fl();if(f){o+='</div></details>';f=0}}
+  else if(/^-{3,}$/.test(l)){fl();o+='<div class="n-hr"></div>'}
+  else if(l.startsWith('> ')){fl();o+='<div class="n-q">'+il(l.slice(2))+'</div>'}
+  else if(m=l.match(/^\[이미지\s+([^\s|\]]+)\s*(?:\|\s*(https?:\/\/[^\s\]]+))?\s*\]$/)){fl();const u=x=>esc(x).replace(/"/g,'%22'),im=(src=>src?'<img src="'+u(src)+'" alt="" loading="lazy">':'<div class="n-p">[이미지 없음: '+esc(m[1])+']</div>')(/^https?:\/\//.test(m[1])?m[1]:IM[m[1]]);const lk=[m[2],LK[m[1]]].find(x=>/^https?:\/\//.test(x||''));o+=lk?'<a class="n-img" href="'+u(lk)+'" target="_blank" rel="noopener">'+im+'</a>':'<div class="n-img">'+im+'</div>'}
+  else if(!l)fl();else b.push(il(l))}
+ fl();if(f)o+='</div></details>';return o}
+
+function gen(){
+ const P=(s.id||'').replace(/[^\w-]/g,'')||'ntc',a=s.color,t1=mix(a,.3),ln=mix(a,.6),hd=mix(a,.92),wn=mix(a,.96),bt=mix(a,.88),hl=mix(a,.85);
+ const ic=n=>s.icon=='none'?'':'<svg width="'+n+'" height="'+n+'" viewBox="0 0 24 24" aria-hidden="true">'+ICONS[s.icon]+'</svg>';
+ const css=`§{--a:${a};--t1:${t1};--ln:${ln};--hd:${hd};--wn:${wn};--bt:${bt};--tx:#2b3a4d;--sb:#6c7f97;--cd:#fff;all:initial;display:block;box-sizing:border-box;width:100%;max-width:${s.width}px;margin:0 auto;font-family:${FONTS[s.font]};font-size:13px;line-height:1.4;color:var(--tx)}
+§ *{box-sizing:border-box;font-family:inherit}
+§ .n-w{background:var(--wn);border:1px solid var(--ln);border-radius:${s.radius}px;${s.shadow?'box-shadow:0 4px 14px rgba(30,60,110,.25);':''}overflow:hidden;color:var(--tx)}
+§ .n-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 6px 10px;background:linear-gradient(var(--t1),var(--a));color:#fff;font-weight:bold;font-size:12px}
+§ .n-tt{display:flex;align-items:center;gap:6px;color:#fff;background:none}
+§ .n-bt{display:flex;background:none}
+§ .n-bt i{display:inline-block;width:18px;height:18px;line-height:16px;text-align:center;margin-left:3px;border:1px solid rgba(255,255,255,.6);border-radius:3px;font-size:11px;font-style:normal;background:rgba(255,255,255,.15);color:#fff}
+§ .n-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--hd);border-bottom:1px solid var(--ln)}
+§ .n-ic{width:34px;height:34px;border-radius:50%;background:linear-gradient(var(--t1),var(--a));display:flex;align-items:center;justify-content:center;flex:none}
+§ .n-h1{font-size:15px;font-weight:bold;line-height:1.3;color:var(--a)}
+§ .n-hs{margin-top:2px;font-size:11px;color:var(--sb)}
+§ .n-bd{display:block;padding:14px}
+§ .n-ps{display:block;background:var(--cd);border:1px solid var(--ln);border-radius:4px;padding:14px;color:var(--tx)}
+§ .n-tag{display:inline-block;background:var(--a);color:#fff;font-size:10px;padding:1px 6px;border-radius:2px;margin-bottom:6px}
+§ .n-h2{font-size:14px;font-weight:bold;line-height:1.4;margin-bottom:4px;color:var(--tx)}
+§ .n-meta{font-size:11px;color:var(--sb);padding-bottom:10px;margin-bottom:10px;border-bottom:1px dashed var(--ln)}
+§ .n-p{margin:0 0 10px;line-height:1.7;font-size:13px;color:var(--tx)}
+§ .n-q{margin:0 0 10px;padding:4px 10px;border-left:3px solid var(--ln);color:var(--sb);line-height:1.7}
+§ .n-hr{height:0;border-top:1px dashed var(--ln);margin:12px 0}
+§ .n-img{display:block;margin:0 0 10px;text-decoration:none;line-height:0}
+§ .n-img img{display:block;max-width:100%;height:auto;border:1px solid var(--ln);border-radius:4px}
+§ b{font-weight:bold}
+§ mark{background:${hl};color:inherit;padding:1px 3px;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+§ a{color:var(--a);text-decoration:underline}
+§ s,§ u{color:inherit}
+§ details{display:block;margin-top:10px;border:1px solid var(--ln);border-radius:3px;background:var(--hd)}
+§ summary{display:block;cursor:pointer;padding:7px 10px;font-weight:bold;font-size:12px;color:var(--a);list-style:none}
+§ summary::-webkit-details-marker{display:none}
+§ summary::before{content:"▶";display:inline-block;font-size:9px;margin-right:6px;transition:transform .15s}
+§ details[open] summary::before{transform:rotate(90deg)}
+§ .n-in{padding:8px 12px 10px;background:var(--cd);border-top:1px solid var(--ln);color:var(--tx)}
+§ .n-in .n-p:last-child{margin:0}
+§ .n-ft{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 14px}
+§ .n-ft label{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sb)}
+§ .n-ft button{font-size:12px;padding:5px 18px;color:var(--tx);background:var(--bt);border:1px solid var(--ln);border-radius:3px;cursor:pointer}`.replace(/§/g,'#'+P);
+ const meta=[s.author&&'작성자 '+esc(s.author),esc(s.date),s.views&&'조회 '+esc(s.views)].filter(Boolean).join(' &nbsp;|&nbsp; ');
+ const html='<div id="'+P+'"><div class="n-w">'
+ +(s.showBar?'<div class="n-bar"><span class="n-tt">'+ic(16)+esc(s.winTitle)+'</span>'+(s.showBtns?'<span class="n-bt"><i>_</i><i>□</i><i>✕</i></span>':'')+'</div>':'')
+ +(s.showHead?'<div class="n-hd">'+(s.icon!='none'?'<div class="n-ic">'+ic(20)+'</div>':'')+'<div><div class="n-h1">'+esc(s.headTitle)+'</div><div class="n-hs">'+esc(s.headSub)+'</div></div></div>':'')
+ +'<div class="n-bd"><div class="n-ps">'+(s.showTag&&s.tag?'<span class="n-tag">'+esc(s.tag)+'</span>':'')+'<div class="n-h2">'+esc(s.title)+'</div>'+(meta?'<div class="n-meta">'+meta+'</div>':'')+body(s.body)+'</div></div>'
+ +(s.showFoot?'<div class="n-ft"><label><input type="checkbox"> '+esc(s.footLabel)+'</label><button type="button">'+esc(s.footBtn)+'</button></div>':'')+'</div></div>';
+ return{css,html}}
+
+function render(){const{css,html}=gen();
+ $('#tout').value=(s.link?LINK+'\n':'')+'<style>\n'+css+'\n</style>\n\n'+html;
+ $('#tpv').innerHTML='<style>'+css+'</style>'+html.replace(/<img src="(https?:[^"]*)" alt="" loading="lazy">/g,'<div style="padding:22px 8px;text-align:center;border:1px dashed var(--ln);color:var(--sb);font-size:11px;word-break:break-all;border-radius:4px;line-height:1.5">이미지 자리 (미리보기에선 안 보여요)<br>$1</div>');
+ $('#tpvbox').style.background=s.pvbg;$('#tsize').textContent=$('#tout').value.length+'자'+($('#tout').value.length>300000?' ⚠ 너무 길어서 게시판이 못 받을 수 있어요. 이미지 크기를 줄여 보세요':'');
+ document.querySelectorAll('[data-v]').forEach(e=>e.textContent=s[e.dataset.v]);
+ try{localStorage.setItem('ntgen',JSON.stringify(s))}catch(e){}}
+
+const inp=(k,l)=>'<label class="t-f"><span>'+l+'</span><input data-k="'+k+'"></label>';
+const chk=(k,l)=>'<label class="t-c"><input type="checkbox" data-k="'+k+'"> '+l+'</label>';
+const rng=(k,l,a,b)=>'<label class="t-f"><span>'+l+' <em data-v="'+k+'"></em></span><input type="range" min="'+a+'" max="'+b+'" data-k="'+k+'"></label>';
+const sel=(k,l,o)=>'<label class="t-f"><span>'+l+'</span><select data-k="'+k+'">'+o.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select></label>';
+const SW=['#2f6fc4','#d9568a','#2a9d8f','#7a5fc7','#e07b39','#55657a','#222222'];
+const sec=(t,c,o)=>'<details class="t-box"'+(o?' open':'')+'><summary>'+t+'</summary><div class="t-in">'+c+'</div></details>';
+$('#tctl').innerHTML=
+ sec('글 내용',inp('title','글 제목')+inp('author','작성자')+inp('date','날짜')+inp('views','조회수')+inp('tag','말머리 (공지 등)')
+  +'<div class="t-f"><span>본문</span><div class="t-tb"><button class="t-b" type="button" data-m="**|**"><b>B</b></button><button class="t-b" type="button" data-m="==|==">형광펜</button><button class="t-b" type="button" data-m="~~|~~"><s>S</s></button><button class="t-b" type="button" data-m="__|__"><u>U</u></button><button class="t-b" type="button" data-m="[접기 제목]\n|\n[/접기]">접기</button><button class="t-b" type="button" data-m="\n---\n|">구분선</button><button class="t-b" type="button" data-m="> |">인용</button><button class="t-b" type="button" data-m="[이미지 https://이미지주소 | https://이동할주소]|">이미지</button><input type="color" id="ttc" value="#e0245e" title="글자색" style="width:30px;height:26px;padding:0;border:0;background:none"></div>'
+  +'<textarea id="tbody" rows="14" data-k="body"></textarea>'
+  +'<div class="t-tb"><button class="t-b" type="button" id="tup">이미지 파일 올리기</button><input type="file" id="tfile" accept="image/*" multiple hidden><select data-k="imgw"><option value="600">최대 가로 600px</option><option value="800">최대 가로 800px</option><option value="1000">최대 가로 1000px</option></select></div><div id="timgs"></div></div>'
+  +'<div class="t-help">**굵게** ==형광펜== ~~취소선~~ __밑줄__ {#e0245e|색깔글씨}<br>[접기 제목] ... [/접기] 로 접기 칸, [펼침 제목]은 처음부터 열림<br>--- 구분선 / 줄 맨 앞 > 인용 / 주소는 자동 링크 / 빈 줄은 문단 나눔<br>[이미지 이미지주소 | 눌렀을 때 이동할 주소] 한 줄로 쓰면 클릭되는 이미지 (뒤쪽 주소는 생략 가능, 주소는 https://로 시작)<br>파일은 위의 이미지 파일 올리기로 올리면 [이미지 사진1] 으로 본문에 들어가요. 링크는 올린 사진 아래 칸에 주소만 적으면 걸려요 (본문에 직접 쓰려면 [이미지 사진1 | https://이동할주소]). 올린 사진은 JPG로 줄여서 코드 안에 직접 담겨요 (GIF는 멈춘 그림이 돼요)</div>',1)
+ +sec('창 제목 · 헤더 문구',inp('winTitle','창 제목줄 (맨 위 파란 줄 글자)')+inp('headTitle','헤더 제목 (큰 파란 글자)')+inp('headSub','헤더 설명 (작은 회색 글자)')+inp('footLabel','체크박스 문구')+inp('footBtn','버튼 문구'),1)
+ +sec('색 · 모양',sel('icon','아이콘',[['mega','확성기'],['bell','종'],['heart','하트'],['star','별'],['info','느낌표'],['mail','편지'],['chat','말풍선'],['note','메모'],['book','책'],['moon','달'],['flower','꽃'],['crown','왕관'],['bolt','번개'],['lock','자물쇠'],['check','체크'],['warn','경고'],['flag','깃발'],['music','음표'],['cat','고양이'],['gift','선물'],['clock','시계'],['diamond','다이아'],['shield','방패'],['leaf','나뭇잎'],['cloud','구름'],['none','없음']])
+  +'<div class="t-f"><span>테마 색</span><div class="t-sw">'+SW.map(c=>'<button type="button" data-c="'+c+'" style="background:'+c+'"></button>').join('')+'<input type="color" data-k="color" title="직접 고르기"></div></div>'
+  +rng('width','가로 폭(px)',300,700)+rng('radius','모서리 둥글기',0,20)+sel('font','글꼴',[['pre','프리텐다드'],['noto','Noto Sans KR'],['sys','시스템 기본'],['ser','명조']])+chk('shadow','그림자'))
+ +sec('보이기 · 숨기기',chk('showBar','제목줄')+chk('showBtns','제목줄 _ □ ✕ 버튼')+chk('showHead','헤더 영역')+chk('showTag','말머리')+chk('showFoot','하단 체크박스 · 확인 버튼'))
+ +sec('출력 옵션',inp('id','고유 ID (한 글에 여러 개 넣을 땐 서로 다르게)')+chk('link','프리텐다드 불러오는 줄을 코드 맨 위에 포함'));
+
+function bind(){document.querySelectorAll('[data-k]').forEach(e=>{const v=s[e.dataset.k];if(e.type=='checkbox')e.checked=!!v;else e.value=v})
+ $('#tpvbg').value=s.pvbg}
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;const t=e.target;s[k]=t.type=='checkbox'?t.checked:t.type=='range'?+t.value:t.value;render()});
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.c){s.color=t.dataset.c;bind();render()}
+ else if(t.dataset.ins){wrap('[이미지 '+t.dataset.ins+']\n','')}
+ else if(t.dataset.del){delete IM[t.dataset.del];delete LK[t.dataset.del];saveIm();saveLk();drawIm();render()}
+ else if(t.dataset.w){$('#tpvw').style.maxWidth=t.dataset.w}
+ else if(t.dataset.m!==undefined){const m=t.dataset.m,i=m.lastIndexOf('|');wrap(m.slice(0,i),m.slice(i+1))}});
+$('#tpvbg').onchange=e=>{s.pvbg=e.target.value;render()};
+$('#ttc').onchange=e=>wrap('{'+e.target.value+'|','}');
+function wrap(l,r){const t=$('#tbody'),a=t.selectionStart,b=t.selectionEnd,v=t.value;t.value=v.slice(0,a)+l+v.slice(a,b)+r+v.slice(b);t.focus();t.selectionStart=a+l.length;t.selectionEnd=b+l.length;t.dispatchEvent(new Event('input',{bubbles:true}))}
+function toast(m){const t=$('#ttoast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1400)}
+$('#tcopy').onclick=async()=>{const o=$('#tout');try{await navigator.clipboard.writeText(o.value);toast('복사했어요')}catch(e){o.select();try{document.execCommand('copy');toast('복사했어요')}catch(x){toast('코드를 길게 눌러 직접 복사해 주세요')}}};
+$('#treset').onclick=()=>{if(confirm('모든 내용을 처음 상태로 되돌릴까요?')){s={...D};bind();render()}};
+$('#ttheme').onclick=()=>{const r=document.documentElement;r.dataset.theme=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))=='dark'?'light':'dark'};
+function saveLk(){try{localStorage.setItem('ntlk',JSON.stringify(LK))}catch(e){}}
+function saveIm(){try{localStorage.setItem('ntimgs',JSON.stringify(IM))}catch(e){toast('이미지가 커서 저장은 못 했어요 (이번 접속 동안만 유지돼요)')}}
+function drawIm(){const k=Object.keys(IM);$('#timgs').innerHTML=k.length?k.map(n=>'<div><div class="t-im"><img src="'+IM[n]+'" alt=""><b>'+n+'</b><em>'+Math.round(IM[n].length*.75/1024)+'KB</em><button class="t-b" type="button" data-ins="'+n+'">넣기</button><button class="t-b" type="button" data-del="'+n+'">삭제</button></div><input class="t-lk" data-lk="'+n+'" value="'+(LK[n]||'').replace(/"/g,'&quot;')+'" placeholder="눌렀을 때 이동할 주소 (https://...)"></div>').join(''):'<div class="t-help">올린 이미지가 여기에 보여요</div>'}
+document.addEventListener('input',e=>{const n=e.target.dataset&&e.target.dataset.lk;if(!n)return;LK[n]=e.target.value.trim();saveLk();render()});
+$('#tup').onclick=()=>$('#tfile').click();
+$('#tfile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';
+ for(const f of fs){await new Promise(res=>{const r=new FileReader();r.onerror=res;r.onload=()=>{const im=new Image();im.onerror=res;im.onload=()=>{let w=im.width,h=im.height;const m=parseInt(s.imgw)||800;if(w>m){h=Math.round(h*m/w);w=m}const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);let n=1;while(IM['사진'+n])n++;IM['사진'+n]=c.toDataURL('image/jpeg',.82);saveIm();drawIm();wrap('\n[이미지 사진'+n+']\n','');res()};im.src=r.result};r.readAsDataURL(f)})}
+ toast('올렸어요! 목록의 사진 아래 칸에 링크 주소를 적을 수 있어요')};
+drawIm();bind();render();
+</script>
+</body>
+</html>
