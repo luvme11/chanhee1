@@ -53,7 +53,7 @@ th{background:#f1f6fc;color:#8a97a8;font-weight:normal;text-align:left;padding:7
 td{padding:11px 8px;border-bottom:1px dashed #dde5f0}
 tr.row{cursor:pointer}tr.row:hover td,tr.sel td{background:#eef4fc}
 th:first-child,td:first-child{width:36px;text-align:center}
-.cb{width:12px;height:12px;border:1px solid #8ea5c4;background:#fff;display:inline-block;vertical-align:middle}
+.cb{position:relative;width:11px;height:14px;border:1px solid #7b94b6;border-radius:2px;background:#fff linear-gradient(#b9c9de,#b9c9de) 2px 6px/5px 1px no-repeat;display:inline-block;vertical-align:middle;box-sizing:border-box;clip-path:polygon(0 0,60% 0,100% 30%,100% 100%,0 100%)}.cb::after{content:"";position:absolute;right:-1px;top:-1px;width:5px;height:5px;background:linear-gradient(225deg,#fff 50%,#dbe6f5 50%);border-left:1px solid #7b94b6;border-bottom:1px solid #7b94b6;box-sizing:border-box}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#9fb3cf}.dot.on{background:#5aa7e8}
 .prof{padding:0;overflow:hidden}
 .av{height:150px;background:radial-gradient(ellipse at 50% 45%,#fff,#dce8f7);display:flex;align-items:center;justify-content:center;position:relative}
@@ -103,7 +103,7 @@ th:first-child,td:first-child{width:36px;text-align:center}
 .post .g{display:inline-block;font-size:10px;color:#5c6b80;background:#e8eef7;border-radius:10px;padding:1px 10px;margin-right:8px}
 .post .d{display:inline-block;font-size:10px;color:#8a97a8}
 .post .pbody{margin-top:14px;padding-top:14px;border-top:1px dashed #dde5f0}
-#blist td:nth-child(3),#blist td:nth-child(4){color:#7b8aa0}
+#blist td:nth-child(3),#blist td:nth-child(4),#nlist td:nth-child(3),#nlist td:nth-child(4){color:#7b8aa0}
 .ov{display:none;position:fixed;inset:0;z-index:30;background:rgba(40,55,80,.45);align-items:center;justify-content:center;padding:12px}
 .aw{width:min(900px,100%);height:min(600px,100%);display:flex;flex-direction:column;background:#f7faff;border:1px solid #9fb3cf;border-radius:10px;box-shadow:0 8px 30px rgba(40,55,80,.4);overflow:hidden}
 .aw.ww{width:min(860px,100%);height:min(640px,100%)}.aw .tt{flex:none}.tt small{font-weight:normal;color:#8a97a8;font-size:10px}
@@ -321,6 +321,7 @@ a.lk{text-decoration:none}
         <div class="si" data-k="f2"><b>02</b>선유이</div>
       </div>
       <div class="nav" data-k="rel"><s></s>우리 사이</div>
+      <div class="nav" data-k="notice"><s></s>공지</div>
       <div class="nav" data-k="board"><s></s>게시글</div>
       <div class="nav" data-k="mini"><s></s>미니홈피</div>
       <div class="nav" data-k="keep"><s></s>채팅</div>
@@ -347,6 +348,11 @@ a.lk{text-decoration:none}
       <div class="pg" id="pg-f1"></div>
       <div class="pg" id="pg-f2"></div>
       <div class="pg" id="pg-rel"></div>
+      <div class="pg" id="pg-notice">
+        <div id="nback" class="tab" style="display:none;margin-bottom:12px;width:fit-content">← 목록으로</div>
+        <table id="nlist"><tr><th></th><th>이름</th><th style="width:110px">종류</th><th style="width:120px">날짜</th></tr><tbody id="nrows"></tbody></table>
+        <div id="npost" class="post open" style="display:none"></div>
+      </div>
       <div class="pg" id="pg-board">
         <div id="bback" class="tab" style="display:none;margin-bottom:12px;width:fit-content">← 목록으로</div>
         <table id="blist"><tr><th></th><th>이름</th><th style="width:110px">종류</th><th style="width:120px">날짜</th></tr><tbody id="brows"></tbody></table>
@@ -383,7 +389,7 @@ a.lk{text-decoration:none}
   <div class="am"><span id="amsg"></span></div>
 </div></div>
 <div class="ov" id="wr-ov" style="z-index:40"><div class="aw ww">
-  <div class="tt"><span>✎ 글쓰기</span><small>글쓰기 전용 창</small><span class="sp"></span><div class="wb"><i id="wr-x">×</i></div></div>
+  <div class="tt"><span id="wr-ttl">✎ 글쓰기</span><small>글쓰기 전용 창</small><span class="sp"></span><div class="wb"><i id="wr-x">×</i></div></div>
   <div class="wbd">
     <input id="wt" placeholder="제목">
     <div class="row2"><input id="wg" placeholder="종류 (태그)"><input id="wd" placeholder="날짜"></div>
@@ -434,13 +440,13 @@ var D={
  keep:['채팅','● 보관한 대화',[['대화 보관 · 첫 대화',0,'2026.04.22']]],
  trash:['휴지통','● 삭제한 항목',[]]
 };
-var P={f1:['친구 · 임찬희','pg-f1'],f2:['친구 · 선유이','pg-f2'],rel:['우리 사이','pg-rel'],board:['게시글','pg-board'],mini:['미니홈피','pg-mini'],keep:['채팅','pg-keep']};
+var P={f1:['친구 · 임찬희','pg-f1'],f2:['친구 · 선유이','pg-f2'],rel:['우리 사이','pg-rel'],notice:['공지','pg-notice'],board:['게시글','pg-board'],mini:['미니홈피','pg-mini'],keep:['채팅','pg-keep']};
 function setTitle(t){ document.getElementById('ttl').textContent=t; document.getElementById('crumb').textContent=t; document.getElementById('cr-mid').innerHTML=''; }
 function render(k){
   if(k!=='keep'&&window.chatStop) window.chatStop();
   var lv=document.getElementById('listview');
   document.querySelectorAll('.pg').forEach(function(x){x.classList.remove('show');});
-  if(P[k]){ if(k==='rel'){ var rp0=document.querySelector('#pg-rel .rp'); if(rp0) rp0.setAttribute('data-v','home'); } lv.style.display='none'; setTitle(P[k][0]); document.getElementById(P[k][1]).classList.add('show'); if(k==='board'&&window.boardReset) window.boardReset(); if(k==='keep'&&window.chatPlay) window.chatPlay(); return; }
+  if(P[k]){ if(k==='rel'){ var rp0=document.querySelector('#pg-rel .rp'); if(rp0) rp0.setAttribute('data-v','home'); } lv.style.display='none'; setTitle(P[k][0]); document.getElementById(P[k][1]).classList.add('show'); if(k==='board'&&window.boardReset) window.boardReset(); if(k==='notice'&&window.noticeReset) window.noticeReset(); if(k==='keep'&&window.chatPlay) window.chatPlay(); return; }
   lv.style.display='block';
   if(k==='chat'){ $('oldlist').style.display='none'; $('homelist').style.display='block'; renderHome(); setTitle(DATA.home.label||'홈'); return; }
   $('oldlist').style.display='block'; $('homelist').style.display='none';
@@ -459,6 +465,7 @@ document.querySelectorAll('.si').forEach(function(n){ n.addEventListener('click'
 
 /* ===== 데이터 (처음 모습. 저장하면 GitHub의 data.json 으로 바뀌어요) ===== */
 var DEF={
+ notices:[],
  posts:[
   {t:'보통 글 예시',g:'일상',d:'2026. 10. 25.',b:'그냥 글은 이렇게 쓰면 돼요.\n\n빈 줄을 넣으면 문단이 나뉘어요. <b>굵게</b>도 쓸 수 있어요.'},
   {t:'인용 글 예시',g:'인용',d:'2026. 10. 24.',b:'<blockquote>인용하고 싶은 문장이에요.</blockquote>\n\n인용 아래에 이어서 글을 쓸 수 있어요.'}],
@@ -479,23 +486,29 @@ var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function fmt(t){t=String(t||'');if(/<(div|style|table|section|center|span|a|p|font)\b/i.test(t)&&/<\/(div|style|table|section|center|span|a|p|font)>/i.test(t))return t;return String(t||'').split(/\n\s*\n/).map(function(c){c=c.trim();if(!c)return '';return /^<(div|blockquote|h\d|ul|ol|hr|img|table|p|figure|section)/i.test(c)?c:'<p>'+c.replace(/\n/g,'<br>')+'</p>';}).join('');}
 function normHome(h){h=h||{};var d=JSON.parse(JSON.stringify(DEF.home));return {label:h.label!=null?h.label:d.label,banner:Object.assign(d.banner,h.banner||{}),friends:Object.assign(d.friends,h.friends||{}),notes:Object.assign(d.notes,h.notes||{})};}
-function norm(j){return {home:normHome(j.home),ticker:Object.assign({},DEF.ticker,j.ticker||{}),dday:Object.assign({},DEF.dday,j.dday||{}),sched:j.sched||JSON.parse(JSON.stringify(DEF.sched)),profile:Object.assign(JSON.parse(JSON.stringify(DEF.profile)),j.profile||{}),music:Object.assign({},DEF.music,j.music||{}),links:j.links||JSON.parse(JSON.stringify(DEF.links)),chat:j.chat||JSON.parse(JSON.stringify(DEF.chat)),posts:j.posts||[],album:j.album||[],pages:Object.assign({},DEF.pages,j.pages||{},{rel:''}),rel:Object.assign(JSON.parse(JSON.stringify(DEF.rel)),j.rel||{})};}
+function norm(j){return {home:normHome(j.home),ticker:Object.assign({},DEF.ticker,j.ticker||{}),dday:Object.assign({},DEF.dday,j.dday||{}),sched:j.sched||JSON.parse(JSON.stringify(DEF.sched)),profile:Object.assign(JSON.parse(JSON.stringify(DEF.profile)),j.profile||{}),music:Object.assign({},DEF.music,j.music||{}),links:j.links||JSON.parse(JSON.stringify(DEF.links)),chat:j.chat||JSON.parse(JSON.stringify(DEF.chat)),posts:j.posts||[],notices:j.notices||[],album:j.album||[],pages:Object.assign({},DEF.pages,j.pages||{},{rel:''}),rel:Object.assign(JSON.parse(JSON.stringify(DEF.rel)),j.rel||{})};}
 
 /* ===== 화면 그리기 ===== */
 var acat='All';
-function renderBoard(){
-  var body=$('brows'); body.innerHTML='';
-  DATA.posts.forEach(function(p){
-    var tr=document.createElement('tr'); tr.className='row';
-    tr.innerHTML='<td><i class="cb"></i></td><td>'+esc(p.t)+'</td><td>'+esc(p.g)+'</td><td>'+esc(p.d)+'</td>';
-    tr.addEventListener('click',function(){ $('blist').style.display='none'; $('bback').style.display='block'; var v=$('bpost'); v.style.display='block';
-      v.innerHTML='<div class="t">'+esc(p.t)+'</div><span class="g">'+esc(p.g)+'</span><span class="d">'+esc(p.d)+'</span><div class="pbody">'+fmt(p.b)+'</div>'; });
-    body.appendChild(tr);
-  });
-  if(!DATA.posts.length) body.innerHTML='<tr class="empty"><td colspan="4">아직 글이 없어요.</td></tr>';
+function makeBoard(key,pre){
+  function render(){
+    var body=$(pre+'rows'); body.innerHTML=''; var arr=DATA[key];
+    arr.forEach(function(p){
+      var tr=document.createElement('tr'); tr.className='row';
+      tr.innerHTML='<td><i class="cb"></i></td><td>'+esc(p.t)+'</td><td>'+esc(p.g)+'</td><td>'+esc(p.d)+'</td>';
+      tr.addEventListener('click',function(){ $(pre+'list').style.display='none'; $(pre+'back').style.display='block'; var v=$(pre+'post'); v.style.display='block';
+        v.innerHTML='<div class="t">'+esc(p.t)+'</div><span class="g">'+esc(p.g)+'</span><span class="d">'+esc(p.d)+'</span><div class="pbody">'+fmt(p.b)+'</div>'; });
+      body.appendChild(tr);
+    });
+    if(!arr.length) body.innerHTML='<tr class="empty"><td colspan="4">아직 글이 없어요.</td></tr>';
+  }
+  function reset(){ $(pre+'list').style.display='table'; $(pre+'back').style.display='none'; $(pre+'post').style.display='none'; }
+  $(pre+'back').addEventListener('click',reset);
+  return {render:render,reset:reset};
 }
-window.boardReset=function(){ $('blist').style.display='table'; $('bback').style.display='none'; $('bpost').style.display='none'; };
-$('bback').addEventListener('click',window.boardReset);
+var BD=makeBoard('posts','b'), NT=makeBoard('notices','n');
+function renderBoard(){ BD.render(); NT.render(); }
+window.boardReset=BD.reset; window.noticeReset=NT.reset;
 function renderAlbum(){
   var cats=[]; DATA.album.forEach(function(a){ if(a.c&&cats.indexOf(a.c)<0) cats.push(a.c); });
   if(acat!=='All'&&cats.indexOf(acat)<0) acat='All';
@@ -740,9 +753,10 @@ function openPick(btn,ta){
     fi.click(); };
   setTimeout(function(){ document.addEventListener('mousedown',outPick); },0);
 }
-var widx=-1;
-function openWriter(i){
-  widx=i; var n=new Date(), p=i>=0?DATA.posts[i]:{t:'',g:'',d:n.getFullYear()+'. '+(n.getMonth()+1)+'. '+n.getDate()+'.',b:''};
+var widx=-1, wkey='posts';
+function openWriter(i,key){
+  wkey=key||'posts'; $('wr-ttl').textContent=wkey==='notices'?'✎ 공지 글쓰기':'✎ 글쓰기';
+  widx=i; var n=new Date(), p=i>=0?DATA[wkey][i]:{t:'',g:'',d:n.getFullYear()+'. '+(n.getMonth()+1)+'. '+n.getDate()+'.',b:''};
   $('wt').value=p.t; $('wg').value=p.g; $('wd').value=p.d; $('wb').value=p.b; $('wc').textContent=p.b.length+'자'; $('wm').textContent='';
   toolbar($('wtb'),$('wb')); $('wr-ov').style.display='flex'; $('wt').focus();
 }
@@ -751,12 +765,12 @@ function closeWriter(){ $('wr-ov').style.display='none'; }
 $('wr-x').onclick=closeWriter; $('wr-close').onclick=closeWriter;
 $('wr-save').onclick=function(){
   var p={t:$('wt').value.trim()||'제목 없음',g:$('wg').value.trim(),d:$('wd').value.trim(),b:$('wb').value};
-  var old=DATA.posts.slice(); if(widx>=0) DATA.posts[widx]=p; else DATA.posts.unshift(p);
-  save(widx>=0?'글 수정':'새 글').then(function(ok){ if(ok) closeWriter(); else DATA.posts=old; });
+  var old=DATA[wkey].slice(); if(widx>=0) DATA[wkey][widx]=p; else DATA[wkey].unshift(p);
+  var k0=wkey; save(widx>=0?'글 수정':'새 글').then(function(ok){ if(ok){ closeWriter(); if($('apanel')&&acur===k0&&PAN[k0]) PAN[k0](); } else DATA[k0]=old; });
 };
 
 /* ===== 관리자 ===== */
-var NAVL=[['set','GitHub 설정'],['home','홈'],['posts','게시글'],['album','앨범'],['f1','친구 01'],['f2','친구 02'],['rel','우리 사이 · 관계 기록'],['chat','채팅'],['prof','프로필'],['music','음악'],['links','링크'],['dday','디데이'],['sched','일정'],['ticker','상태바']], acur='set', PAN={};
+var NAVL=[['set','GitHub 설정'],['home','홈'],['notices','공지'],['posts','게시글'],['album','앨범'],['f1','친구 01'],['f2','친구 02'],['rel','우리 사이 · 관계 기록'],['chat','채팅'],['prof','프로필'],['music','음악'],['links','링크'],['dday','디데이'],['sched','일정'],['ticker','상태바']], acur='set', PAN={};
 function showPan(k){ acur=k; [].forEach.call($('anav').children,function(c){ c.classList.toggle('on',c.getAttribute('data-a')===k); }); PAN[k](); }
 function openAdmin(){
   $('adm-ov').style.display='flex'; msg('');
@@ -822,15 +836,20 @@ PAN.home=function(){
   }
   draw();
 };
-PAN.posts=function(){
-  var h='<div class="btns"><button class="bt p" id="p-new">+ 새 글</button></div><table class="at"><tr><th>제목</th><th>종류</th><th>날짜</th><th></th></tr>';
-  DATA.posts.forEach(function(p,i){ h+='<tr><td>'+esc(p.t)+'</td><td>'+esc(p.g)+'</td><td>'+esc(p.d)+'</td><td><button class="bt" data-e="'+i+'">수정</button> <button class="bt" data-d="'+i+'">삭제</button></td></tr>'; });
-  if(!DATA.posts.length) h+='<tr><td colspan="4" class="hint">아직 글이 없어요.</td></tr>';
-  $('apanel').innerHTML=h+'</table>';
-  $('p-new').onclick=function(){ openWriter(-1); };
-  [].forEach.call($('apanel').querySelectorAll('[data-e]'),function(b){ b.onclick=function(){ openWriter(+b.getAttribute('data-e')); }; });
-  [].forEach.call($('apanel').querySelectorAll('[data-d]'),function(b){ b.onclick=function(){ if(!confirm('이 글을 삭제할까요?')) return; var old=DATA.posts.slice(); DATA.posts.splice(+b.getAttribute('data-d'),1); save('글 삭제').then(function(ok){ if(!ok){ DATA.posts=old; PAN.posts(); } }); }; });
-};
+function postPanel(key,label){
+  return function(){
+    var arr=DATA[key];
+    var h='<div class="btns"><button class="bt p" id="p-new">+ 새 글</button></div><table class="at"><tr><th>제목</th><th>종류</th><th>날짜</th><th></th></tr>';
+    arr.forEach(function(p,i){ h+='<tr><td>'+esc(p.t)+'</td><td>'+esc(p.g)+'</td><td>'+esc(p.d)+'</td><td><button class="bt" data-e="'+i+'">수정</button> <button class="bt" data-d="'+i+'">삭제</button></td></tr>'; });
+    if(!arr.length) h+='<tr><td colspan="4" class="hint">아직 글이 없어요.</td></tr>';
+    $('apanel').innerHTML=h+'</table>';
+    $('p-new').onclick=function(){ openWriter(-1,key); };
+    [].forEach.call($('apanel').querySelectorAll('[data-e]'),function(b){ b.onclick=function(){ openWriter(+b.getAttribute('data-e'),key); }; });
+    [].forEach.call($('apanel').querySelectorAll('[data-d]'),function(b){ b.onclick=function(){ if(!confirm('이 글을 삭제할까요?')) return; var old=DATA[key].slice(); DATA[key].splice(+b.getAttribute('data-d'),1); save('글 삭제').then(function(ok){ if(!ok){ DATA[key]=old; } PAN[key](); }); }; });
+  };
+}
+PAN.posts=postPanel('posts');
+PAN.notices=postPanel('notices');
 PAN.album=function(){
   var cats=[]; DATA.album.forEach(function(a){ if(a.c&&cats.indexOf(a.c)<0) cats.push(a.c); });
   var h='<div class="btns"><input type="file" id="a-file" accept="image/*" multiple><input id="a-cat" list="a-dl" placeholder="분류 (예: Together)" style="width:180px"><datalist id="a-dl">'+cats.map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist><button class="bt p" id="a-up" style="min-width:100px">사진 올리기</button><span class="sp"></span><button class="bt p" id="a-sv" style="min-width:110px">저장 (GitHub)</button></div><p class="hint">사진마다 제목 · 코드네임 · 설명을 적으면 사진을 눌렀을 때 크게 보기 창에 나와요. 고친 뒤 꼭 저장을 눌러 주세요.</p><div class="agrid2">';
@@ -936,7 +955,7 @@ PAN.music=function(){
 PAN.links=function(){
   var W=JSON.parse(JSON.stringify(DATA.links||[]));
   function draw(){
-    var h='<h3>LINKS 버튼</h3><p class="hint">버튼 이름과 주소를 적어요. 주소가 https:// 로 시작하면 새 창으로 열리고, <b>#mini</b> 처럼 # 로 시작하면 사이트 안 메뉴로 이동해요.<br>#chat 홈 · #keep 채팅 · #friends 친구 · #f1 · #f2 · #rel 우리 사이 · #board 게시글 · #mini 미니홈피</p>';
+    var h='<h3>LINKS 버튼</h3><p class="hint">버튼 이름과 주소를 적어요. 주소가 https:// 로 시작하면 새 창으로 열리고, <b>#mini</b> 처럼 # 로 시작하면 사이트 안 메뉴로 이동해요.<br>#chat 홈 · #keep 채팅 · #friends 친구 · #f1 · #f2 · #rel 우리 사이 · #notice 공지 · #board 게시글 · #mini 미니홈피</p>';
     W.forEach(function(l,i){ h+='<div class="crow"><input data-lt="'+i+'" value="'+esc(l.t)+'" placeholder="버튼 이름" style="max-width:170px"><input data-lu="'+i+'" value="'+esc(l.u)+'" placeholder="https://… 또는 #mini"><button class="bt" data-up="'+i+'">↑</button><button class="bt" data-dn="'+i+'">↓</button><button class="bt" data-rm="'+i+'">✕</button></div>'; });
     h+='<div class="btns"><button class="bt" id="lk-add">+ 버튼 추가</button><span class="sp"></span><button class="bt p" id="lk-sv" style="min-width:110px">저장 (GitHub)</button></div>';
     $('apanel').innerHTML=h; bind();
