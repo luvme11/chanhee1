@@ -408,7 +408,7 @@ a.lk{text-decoration:none}
       <div class="nav" data-k="notice"><s></s>공지</div>
       <div class="nav" data-k="board" id="nv-board"><s></s>게시글<u id="nv-bu" style="display:none">▾</u></div>
       <div id="bsub" class="subs"></div>
-      <div class="nav" data-k="mini"><s></s>미니홈피</div>
+      <div class="nav" data-k="mini"><s></s>갤러리</div>
       <div class="nav" data-k="keep"><s></s>채팅</div>
       <div class="card dd"><div class="dh"><i></i><span id="dd-lb">ONNATE</span></div><div class="db"><div class="dt" id="dd-t"></div><div class="dn" id="dd-n">D+0</div><div class="ds" id="dd-s"></div><div class="dm" id="dd-m"></div></div></div>
       <div class="card sc"><div class="dh"><i></i><span id="sc-t">일정</span></div><div class="sl" id="sc-l"></div></div>
@@ -543,7 +543,7 @@ var D={
  keep:['채팅','● 보관한 대화',[['대화 보관 · 첫 대화',0,'2026.04.22']]],
  trash:['휴지통','● 삭제한 항목',[]]
 };
-var P={f1:['친구 · 임찬희','pg-f1'],f2:['친구 · 선유이','pg-f2'],rel:['우리 사이','pg-rel'],notice:['공지','pg-notice'],board:['게시글','pg-board'],mini:['미니홈피','pg-mini'],keep:['채팅','pg-keep']};
+var P={f1:['친구 · 임찬희','pg-f1'],f2:['친구 · 선유이','pg-f2'],rel:['우리 사이','pg-rel'],notice:['공지','pg-notice'],board:['게시글','pg-board'],mini:['갤러리','pg-mini'],keep:['채팅','pg-keep']};
 function setTitle(t){ document.getElementById('ttl').textContent=t; document.getElementById('crumb').textContent=t; document.getElementById('cr-mid').innerHTML=''; }
 function render(k){
   if(k!=='keep'&&window.chatStop) window.chatStop();
@@ -578,7 +578,7 @@ var DEF={
  sched:{title:'성운대학교 학과 일정',items:[{d:'2026-10-20',e:'',t:'중간고사 종료'},{d:'2026-10-27',e:'',t:'학과 MT 신청 마감'},{d:'2026-11-02',e:'2026-11-06',t:'기말 수강정정 기간'},{d:'2026-11-12',e:'',t:'학과 총회'}]},
  profile:{img:'',name:'선유이',rows:[{k:'ID',v:'Seonyui_'},{k:'STATUS',v:'온라인'},{k:'SINCE',v:'2026. 04. 22.'}]},
  music:{url:'',label:'지금 듣는 음악',artist:'임찬희',volume:60,loop:false,cover:''},
- links:[{t:'미니홈피 바로가기',u:'#mini'},{t:'새 대화 시작하기',u:'#keep'}],
+ links:[{t:'갤러리 바로가기',u:'#mini'},{t:'새 대화 시작하기',u:'#keep'}],
  chat:{l:{name:'임찬희',img:''},r:{name:'선유이',img:''},msgs:[{s:'r',t:'자니?'},{s:'l',t:'아니, 안 자.'},{s:'l',t:'왜 불렀어?'},{s:'r',t:'그냥 불러봤어 ㅎㅎ'}]},
  home:{label:'홈',banner:{img:'',title:'onnate',sub:'임찬희',w:84,cover:false},friends:{title:'친구목록',head:'한마디',items:[{n:'임찬희',s:'on',t:''},{n:'선유이',s:'on',t:''}]},notes:{title:'쪽지',items:[{n:'임찬희',r:0},{n:'선유이',r:1},{n:'임찬희',r:1}]}},
  album:[],
@@ -1234,7 +1234,7 @@ PAN.music=function(){
 PAN.links=function(){
   var W=JSON.parse(JSON.stringify(DATA.links||[]));
   function draw(){
-    var h='<h3>LINKS 버튼</h3><p class="hint">버튼 이름과 주소를 적어요. 주소가 https:// 로 시작하면 새 창으로 열리고, <b>#mini</b> 처럼 # 로 시작하면 사이트 안 메뉴로 이동해요.<br>#chat 홈 · #keep 채팅 · #friends 친구 · #f1 · #f2 · #rel 우리 사이 · #notice 공지 · #board 게시글 · #mini 미니홈피</p>';
+    var h='<h3>LINKS 버튼</h3><p class="hint">버튼 이름과 주소를 적어요. 주소가 https:// 로 시작하면 새 창으로 열리고, <b>#mini</b> 처럼 # 로 시작하면 사이트 안 메뉴로 이동해요.<br>#chat 홈 · #keep 채팅 · #friends 친구 · #f1 · #f2 · #rel 우리 사이 · #notice 공지 · #board 게시글 · #mini 갤러리</p>';
     W.forEach(function(l,i){ h+='<div class="crow"><input data-lt="'+i+'" value="'+esc(l.t)+'" placeholder="버튼 이름" style="max-width:170px"><input data-lu="'+i+'" value="'+esc(l.u)+'" placeholder="https://… 또는 #mini"><button class="bt" data-up="'+i+'">↑</button><button class="bt" data-dn="'+i+'">↓</button><button class="bt" data-rm="'+i+'">✕</button></div>'; });
     h+='<div class="btns"><button class="bt" id="lk-add">+ 버튼 추가</button><span class="sp"></span><button class="bt p" id="lk-sv" style="min-width:110px">저장 (GitHub)</button></div>';
     $('apanel').innerHTML=h; bind();
