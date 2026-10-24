@@ -505,7 +505,7 @@ function renderAlbum(){
   shown.forEach(function(it,idx){
     var d=document.createElement('div'); d.className='al';
     d.innerHTML='<div class="im">사진 자리<img alt=""></div><div class="nm"><i class="cb"></i> '+esc(it.f.split('/').pop())+'</div>';
-    var im=d.querySelector('img'); im.onerror=function(){im.remove();}; im.src=it.f;
+    var im=d.querySelector('img'); im.onerror=function(){ im.remove(); var b=d.querySelector('.im'); b.style.whiteSpace='pre-wrap'; b.style.wordBreak='break-all'; b.style.padding='6px'; b.style.textAlign='center'; b.textContent='불러오기 실패\n'+it.f; }; im.src=RELLOCAL[it.f]||it.f;
     d.addEventListener('click',function(){ if(!d.querySelector('img')) return; lbOpen(shown,idx); });
     g.appendChild(d); });
 }
@@ -514,7 +514,7 @@ var LB={list:[],i:0,z:1,tm:null};
 function lbZoom(z,abs){ LB.z=abs?z:Math.max(1,Math.min(4,LB.z+z)); var im=$('lbimg');
   if(LB.z===1){ im.style.width=''; im.style.maxWidth='100%'; im.style.maxHeight='60vh'; } else { im.style.maxWidth='none'; im.style.maxHeight='none'; im.style.width=(LB.z*100)+'%'; } }
 function lbShow(){ var it=LB.list[LB.i]; if(!it) return;
-  $('lbimg').src=it.f; $('lbname').textContent=it.f.split('/').pop();
+  $('lbimg').src=RELLOCAL[it.f]||it.f; $('lbname').textContent=it.f.split('/').pop();
   $('lbtitle').textContent=it.t||''; $('lbtitle').style.display=it.t?'block':'none';
   var sub=[]; if(it.n) sub.push('코드네임: '+it.n); if(it.c) sub.push(it.c); $('lbsub').textContent=sub.join(' · '); $('lbsub').style.display=sub.length?'block':'none';
   $('lbdesc').textContent=it.d||''; $('lbdesc').style.display=it.d?'block':'none';
@@ -563,12 +563,12 @@ $('lb').addEventListener('click',function(){ this.style.display='none'; });
 
 /* ===== 채팅 (실시간처럼 나타나기) ===== */
 var cgen=0, ctm=null, DEFIMG=(document.querySelector('.av img')||{}).src||'';
-function cinfo(side){ var c=((window.CHATSRC||DATA.chat)&&(window.CHATSRC||DATA.chat)[side])||{}; return {name:c.name||(side==='l'?'상대':'나'),img:c.img||DEFIMG}; }
-function chatHead(){ var l=cinfo('l'),r=cinfo('r'); $('ch-ht').textContent='CHAT · '+l.name+' & '+r.name; $('ch-hi').src=l.img; $('ch-ph').textContent=l.name+' 에게 말 걸기'; }
+function cinfo(side){ var c=((window.CHATSRC||DATA.chat)&&(window.CHATSRC||DATA.chat)[side])||{}; return {name:c.name||(side==='l'?'상대':'나'),img:RELLOCAL[c.img]||c.img||DEFIMG}; }
+function chatHead(){ var l=cinfo('l'),r=cinfo('r'); $('ch-ht').textContent='CHAT · '+l.name+' & '+r.name; var hi=$('ch-hi'); hi.onerror=function(){ hi.onerror=null; hi.src=DEFIMG; }; hi.src=l.img; $('ch-ph').textContent=l.name+' 에게 말 걸기'; }
 function crow(side,first,inner){
   var i=cinfo(side), d=document.createElement('div'); d.className='cr c'+(side==='r'?'R':'L')+(first?' first':'');
   d.innerHTML='<img class="cav'+(first?'':' sp0')+'" alt=""><div class="cb2">'+(first?'<div class="cnm">'+esc(i.name)+'</div>':'')+inner+'</div>';
-  d.querySelector('img').src=i.img; return d;
+  var im=d.querySelector('img'); im.onerror=function(){ im.onerror=null; im.src=DEFIMG; }; im.src=i.img; return d;
 }
 function cbody(t){ var h=String(t||'').replace(/&(?!amp;)/g,'&amp;').replace(/<(?!\/?(b|i|br|img|span)\b)/g,'&lt;'); return h.replace(/\n/g,'<br>'); }
 function chatStop(){ cgen++; if(ctm){clearTimeout(ctm); ctm=null;} }
@@ -668,7 +668,19 @@ function gh(m,path,body){
 }
 function b64(s){return btoa(unescape(encodeURIComponent(s)));}
 function explain(e){return e.status===401?'토큰이 올바르지 않아요.':e.status===403?'토큰 권한이 부족해요. (Contents 쓰기 권한이 필요해요)':e.status===404?'저장소 이름이나 브랜치를 확인해 주세요.':e.message;}
-function loadRemote(){ return gh('GET',CFG.path||'data.json').then(function(j){ DATA=norm(JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))))); cacheSave(); }); }
+function loadRemote(){
+  var path=CFG.path||'data.json';
+  return gh('GET',path).then(function(j){
+    var txt='';
+    if(j.content&&j.encoding==='base64'){ try{ txt=decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))); }catch(e){ txt=''; } }
+    if(String(txt).trim()) return txt;
+    return fetch('https://api.github.com/repos/'+CFG.repo+'/contents/'+path+(CFG.branch?'?ref='+encodeURIComponent(CFG.branch):''),{cache:'no-store',headers:{'Authorization':'Bearer '+CFG.token,'Accept':'application/vnd.github.raw+json'}})
+      .then(function(r){ if(!r.ok){ var e=new Error(String(r.status)); e.status=r.status; throw e; } return r.text(); });
+  }).then(function(txt){
+    if(!String(txt).trim()) throw new Error('data.json 이 비어 있어요. 저장소의 data.json 내용을 확인해 주세요.');
+    DATA=norm(JSON.parse(txt)); cacheSave();
+  });
+}
 function commit(m){
   var path=CFG.path||'data.json';
   function once(){
@@ -688,7 +700,7 @@ function save(m){
 }
 function upImg(file){ return new Promise(function(res,rej){
   var fr=new FileReader(); fr.onerror=rej;
-  function put(ext,data){ var name='images/'+Date.now()+'-'+Math.random().toString(36).slice(2,6)+'.'+ext, body={message:'사진 추가',content:data}; if(CFG.branch) body.branch=CFG.branch; gh('PUT',name,body).then(function(){res(name);},rej); }
+  function put(ext,data){ var name='images/'+Date.now()+'-'+Math.random().toString(36).slice(2,6)+'.'+ext, body={message:'사진 추가',content:data}; if(CFG.branch) body.branch=CFG.branch; gh('PUT',name,body).then(function(){ try{ RELLOCAL[name]='data:image/'+(ext==='jpg'?'jpeg':ext)+';base64,'+data; }catch(e){} res(name);},rej); }
   fr.onload=function(){
     if(file.type==='image/gif'){ put('gif',fr.result.split(',')[1]); return; }
     var im=new Image(); im.onerror=rej; im.onload=function(){
@@ -821,7 +833,7 @@ PAN.posts=function(){
 PAN.album=function(){
   var cats=[]; DATA.album.forEach(function(a){ if(a.c&&cats.indexOf(a.c)<0) cats.push(a.c); });
   var h='<div class="btns"><input type="file" id="a-file" accept="image/*" multiple><input id="a-cat" list="a-dl" placeholder="분류 (예: Together)" style="width:180px"><datalist id="a-dl">'+cats.map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist><button class="bt p" id="a-up" style="min-width:100px">사진 올리기</button><span class="sp"></span><button class="bt p" id="a-sv" style="min-width:110px">저장 (GitHub)</button></div><p class="hint">사진마다 제목 · 코드네임 · 설명을 적으면 사진을 눌렀을 때 크게 보기 창에 나와요. 고친 뒤 꼭 저장을 눌러 주세요.</p><div class="agrid2">';
-  DATA.album.forEach(function(a,i){ h+='<div class="ac"><img src="'+esc(a.f)+'" alt=""><input data-ac="'+i+'" value="'+esc(a.c)+'" placeholder="분류"><input data-at="'+i+'" value="'+esc(a.t||'')+'" placeholder="제목 (예: 증명사진)"><input data-an="'+i+'" value="'+esc(a.n||'')+'" placeholder="코드네임 (예: 에덴, 이브)"><textarea data-ad="'+i+'" placeholder="설명">'+esc(a.d||'')+'</textarea><div class="row2"><button class="bt" data-lf="'+i+'">◀</button><button class="bt" data-rt="'+i+'">▶</button><button class="bt" data-r="'+i+'" style="flex:1">삭제</button></div></div>'; });
+  DATA.album.forEach(function(a,i){ h+='<div class="ac"><img src="'+esc(RELLOCAL[a.f]||a.f)+'" alt=""><input data-ac="'+i+'" value="'+esc(a.c)+'" placeholder="분류"><input data-at="'+i+'" value="'+esc(a.t||'')+'" placeholder="제목 (예: 증명사진)"><input data-an="'+i+'" value="'+esc(a.n||'')+'" placeholder="코드네임 (예: 에덴, 이브)"><textarea data-ad="'+i+'" placeholder="설명">'+esc(a.d||'')+'</textarea><div class="row2"><button class="bt" data-lf="'+i+'">◀</button><button class="bt" data-rt="'+i+'">▶</button><button class="bt" data-r="'+i+'" style="flex:1">삭제</button></div></div>'; });
   var P=$('apanel'); P.innerHTML=h+'</div>';
   function sync(){ [['ac','c'],['at','t'],['an','n'],['ad','d']].forEach(function(x){ [].forEach.call(P.querySelectorAll('[data-'+x[0]+']'),function(e){ DATA.album[+e.getAttribute('data-'+x[0])][x[1]]=e.value.trim(); }); }); }
   $('a-sv').onclick=function(){ sync(); save('앨범 정보 수정'); };
