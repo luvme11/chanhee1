@@ -521,7 +521,7 @@ function renderAll(){ renderSide(); renderLeft(); chatHead(); ['f1','f2','rel'].
 /* ===== GitHub ===== */
 function gh(m,path,body){
   var u='https://api.github.com/repos/'+CFG.repo+'/contents/'+path+(m==='GET'&&CFG.branch?'?ref='+encodeURIComponent(CFG.branch):'');
-  return fetch(u,{method:m,headers:{'Authorization':'Bearer '+CFG.token,'Accept':'application/vnd.github+json'},body:body?JSON.stringify(body):undefined})
+  return fetch(u,{method:m,cache:'no-store',headers:{'Authorization':'Bearer '+CFG.token,'Accept':'application/vnd.github+json'},body:body?JSON.stringify(body):undefined})
    .then(function(r){ return r.json().then(function(j){ if(!r.ok){ var e=new Error(j.message||r.status); e.status=r.status; throw e; } return j; }); });
 }
 function b64(s){return btoa(unescape(encodeURIComponent(s)));}
@@ -529,9 +529,12 @@ function explain(e){return e.status===401?'토큰이 올바르지 않아요.':e.
 function loadRemote(){ return gh('GET',CFG.path||'data.json').then(function(j){ DATA=norm(JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))))); }); }
 function commit(m){
   var path=CFG.path||'data.json';
-  return gh('GET',path).catch(function(e){ if(e.status===404) return {}; throw e; }).then(function(cur){
-    var body={message:m,content:b64(JSON.stringify(DATA,null,1))}; if(cur.sha) body.sha=cur.sha; if(CFG.branch) body.branch=CFG.branch;
-    return gh('PUT',path,body); });
+  function once(){
+    return gh('GET',path).catch(function(e){ if(e.status===404) return {}; throw e; }).then(function(cur){
+      var body={message:m,content:b64(JSON.stringify(DATA,null,1))}; if(cur.sha) body.sha=cur.sha; if(CFG.branch) body.branch=CFG.branch;
+      return gh('PUT',path,body); });
+  }
+  return once().catch(function(e){ if(e.status===409||e.status===422||/does not match/i.test(e.message||'')) return new Promise(function(r){ setTimeout(r,800); }).then(once); throw e; });
 }
 function msg(t,err){ ['amsg','wm'].forEach(function(i){ var e=$(i); e.textContent=t; e.style.color=err?'#c0463a':'#4a6fa5'; }); }
 function needCfg(){ if(CFG.token&&CFG.repo) return true; msg('먼저 「GitHub 설정」에서 저장소와 토큰을 넣어 주세요.',1); return false; }
