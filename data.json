@@ -1,0 +1,131 @@
+{
+ "posts": [
+  {
+   "t": "인용 글 예시",
+   "g": "인용",
+   "d": "2026. 10. 24.",
+   "b": "<blockquote>인용하고 싶은 문장이에요.</blockquote>\n\n인용 아래에 이어서 글을 쓸 수 있어요."
+  }
+ ],
+ "ticker": {
+  "count": "ⓒ noxuelux",
+  "text": "♡ chanhee yui 님이 접속했어요.",
+  "speed": 3
+ },
+ "dday": {
+  "label": "ONNATE",
+  "title": "우리가 함께한 지",
+  "date": "2026-04-22",
+  "first": true,
+  "sub": "",
+  "milestone": true
+ },
+ "sched": {
+  "title": "성운대학교 학과 일정",
+  "items": [
+   {
+    "d": "2026-10-20",
+    "e": "",
+    "t": "중간고사 종료"
+   },
+   {
+    "d": "2026-10-27",
+    "e": "",
+    "t": "학과 MT 신청 마감"
+   },
+   {
+    "d": "2026-11-02",
+    "e": "2026-11-06",
+    "t": "기말 수강정정 기간"
+   },
+   {
+    "d": "2026-11-12",
+    "e": "",
+    "t": "학과 총회"
+   }
+  ]
+ },
+ "profile": {
+  "img": "",
+  "name": "Seonyui_",
+  "rows": [
+   {
+    "k": "ID",
+    "v": "Seonyui_"
+   },
+   {
+    "k": "STATUS",
+    "v": "온라인"
+   },
+   {
+    "k": "SINCE",
+    "v": "2026. 04. 22."
+   }
+  ]
+ },
+ "music": {
+  "url": "",
+  "label": "지금 듣는 음악",
+  "artist": "chanhee yui",
+  "volume": 60,
+  "loop": false,
+  "cover": ""
+ },
+ "links": [
+  {
+   "t": "미니홈피 바로가기",
+   "u": "#mini"
+  },
+  {
+   "t": "새 대화 시작하기",
+   "u": "#keep"
+  }
+ ],
+ "chat": {
+  "l": {
+   "name": "chanhee yui",
+   "img": ""
+  },
+  "r": {
+   "name": "Seonyui_",
+   "img": ""
+  },
+  "msgs": [
+   {
+    "s": "r",
+    "t": "자니?"
+   },
+   {
+    "s": "l",
+    "t": "아니, 안 자."
+   },
+   {
+    "s": "l",
+    "t": "왜 불렀어?"
+   },
+   {
+    "s": "r",
+    "t": "그냥 불러봤어 ㅎㅎ"
+   }
+  ]
+ },
+ "album": [
+  {
+   "f": "album-1.jpg",
+   "c": "chanhee yui"
+  },
+  {
+   "f": "album-2.jpg",
+   "c": "Seonyui_"
+  },
+  {
+   "f": "album-3.jpg",
+   "c": "Together"
+  }
+ ],
+ "pages": {
+  "f1": "여기는 chanhee yui 페이지예요.",
+  "f2": "여기는 Seonyui_ 페이지예요.",
+  "rel": "여기는 우리 사이 페이지예요."
+ }
+}
