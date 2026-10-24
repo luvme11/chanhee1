@@ -1,12 +1,5 @@
 {
- "posts": [
-  {
-   "t": "인용 글 예시",
-   "g": "인용",
-   "d": "2026. 10. 24.",
-   "b": "<blockquote>인용하고 싶은 문장이에요.</blockquote>\n\n인용 아래에 이어서 글을 쓸 수 있어요."
-  }
- ],
+ "posts": [],
  "ticker": {
   "count": "ⓒ noxuelux",
   "text": "♡ chanhee yui 님이 접속했어요.",
