@@ -126,12 +126,12 @@
  },
  "links": [
   {
-   "t": "미니홈피 바로가기",
-   "u": "#mini"
+   "t": "홈",
+   "u": "https://luvme11.github.io/NEW-HOME/index.html"
   },
   {
-   "t": "새 대화 시작하기",
-   "u": "#keep"
+   "t": "7",
+   "u": "https://luvme11.github.io/7/home.html"
   }
  ],
  "chat": {
