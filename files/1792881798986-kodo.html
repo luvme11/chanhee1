@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OOC LOG MAKER</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{--bg:#dfe9f5;--cd:#f4f8fd;--ln:#9db6d6;--tx:#2b3a4d;--sb:#6c7f97;--a:#2f6fc4;--in:#fff;--hd:#eaf2fc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b26;--cd:#1d2635;--ln:#3a4f6d;--tx:#dbe5f2;--sb:#8fa3bd;--a:#7db3f5;--in:#141b26;--hd:#223049}}
+:root[data-theme="dark"]{--bg:#141b26;--cd:#1d2635;--ln:#3a4f6d;--tx:#dbe5f2;--sb:#8fa3bd;--a:#7db3f5;--in:#141b26;--hd:#223049}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.5 "Pretendard","Noto Sans KR","Malgun Gothic",sans-serif}
+.t-wrap{max-width:1100px;margin:0 auto;padding:12px}
+.t-top{display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(#5b9be0,#2f6fc4);color:#fff;border-radius:8px 8px 0 0}
+.t-top b{font-size:14px}.t-top span{font-size:11px;opacity:.85;flex:1}
+button,select,input,textarea{font:inherit;color:var(--tx)}
+.t-b{padding:4px 10px;background:var(--hd);border:1px solid var(--ln);border-radius:3px;cursor:pointer}
+.t-b:hover,.t-b.on{border-color:var(--a);color:var(--a)}
+.t-b.on{font-weight:bold}
+.t-grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:12px;margin-top:12px}
+@media(max-width:820px){.t-grid{grid-template-columns:1fr}}
+.t-box{background:var(--cd);border:1px solid var(--ln);border-radius:4px;margin-bottom:10px}
+.t-box>summary,.t-ttl{padding:8px 12px;font-weight:bold;color:var(--a);cursor:pointer;list-style:none;border-bottom:1px solid var(--ln);background:var(--hd)}
+.t-ttl{cursor:default;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.t-ttl .sp{flex:1}
+.t-in{padding:10px 12px;display:grid;gap:8px}
+.t-f{display:grid;gap:3px}.t-f>span{font-size:11px;color:var(--sb)}
+.t-f input:not([type=range]):not([type=color]),.t-f select,textarea{width:100%;padding:6px 8px;background:var(--in);border:1px solid var(--ln);border-radius:3px}
+.t-f input[type=color]{width:100%;height:28px;padding:0;border:1px solid var(--ln);background:none}
+textarea{resize:vertical;line-height:1.6}
+.t-c{display:flex;gap:6px;align-items:center}
+.t-g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.t-tb{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.t-pr{display:flex;gap:6px;flex-wrap:wrap}
+.t-pr button{display:flex;align-items:center;gap:5px}.t-pr i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.t-help{font-size:11px;color:var(--sb);line-height:1.7}
+.t-im{display:flex;align-items:center;gap:6px;margin-top:4px}.t-im img{width:36px;height:36px;object-fit:cover;border:1px solid var(--ln);border-radius:3px;display:inline-block}.t-im b{flex:1}.t-im em{font-size:11px;color:var(--sb);font-style:normal}
+#tpvw{padding:18px 14px;margin:0 auto;overflow-x:auto;transition:max-width .2s}
+#tout{width:100%;height:220px;font:11px/1.5 monospace;white-space:pre}
+.t-toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--a);color:#fff;padding:8px 16px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.t-toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="t-wrap">
+  <div class="t-top"><b>OOC LOG MAKER</b><span>주제별 말풍선 + 복사 버튼 · 배경 투명</span><button class="t-b" id="ttheme" type="button">화면 밝기</button></div>
+  <div class="t-grid">
+    <div id="tctl"></div>
+    <div>
+      <div class="t-box">
+        <div class="t-ttl">미리보기<span class="sp"></span>
+          <button class="t-b" type="button" data-w="100%">PC</button>
+          <button class="t-b" type="button" data-w="360px">모바일</button>
+          <select id="tpvbg" class="t-b"><option value="#ffffff">흰 배경</option><option value="#f1f3f5">회색 배경</option><option value="#f6efe0">베이지 배경</option><option value="#1a1a1a">어두운 배경</option></select>
+        </div>
+        <div id="tpvbox"><div id="tpvw"><div id="tpv"></div></div></div>
+      </div>
+      <div class="t-box">
+        <div class="t-ttl">게시판에 붙여넣을 코드 <span id="tsize" class="t-help"></span><span class="sp"></span>
+          <button class="t-b" type="button" id="tcopy">전체 코드 복사</button>
+          <button class="t-b" type="button" id="tcopy1">이 주제만 복사</button>
+          <button class="t-b" type="button" id="treset">초기화</button>
+        </div>
+        <div class="t-in"><textarea id="tout" readonly></textarea>
+        <div class="t-help">글 편집창을 HTML 모드로 바꾼 뒤 통째로 붙여넣으세요. 주제마다 글을 따로 올리고 싶으면 <b>이 주제만 복사</b>를 쓰세요. 말풍선 아래 복사 버튼은 글을 보는 사람이 내용을 복사하는 버튼이에요. 게시판이 버튼 동작(onclick)을 막으면 눌러도 복사가 안 될 수 있어요. 설정과 올린 사진은 이 브라우저에 자동 저장돼요 (저장이 막힌 환경이면 작업 후 바로 복사해 두세요).</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="t-toast" id="ttoast"></div>
+<script>
+const $=q=>document.querySelector(q);
+const LINK='<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">';
+const FONTS={pre:'"Pretendard","Pretendard Variable","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',noto:'"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',sys:'"Malgun Gothic","Apple SD Gothic Neo",sans-serif',ser:'"Nanum Myeongjo","Noto Serif KR","Batang",serif'};
+/* ac=라벨·복사 버튼색, bb=말풍선 배경, tx=글자색, ln=테두리, ot=한 줄 설명 글자색 */
+const PRE={
+nate:{ac:'#2f6fc4',bb:'#ffffff',tx:'#2b3a4d',ot:'#6c7f97',ln:'#9db6d6'},
+pink:{ac:'#d9568a',bb:'#ffffff',tx:'#4a2b38',ot:'#a07084',ln:'#f0b5cb'},
+mint:{ac:'#2a9d8f',bb:'#ffffff',tx:'#23423e',ot:'#6b928d',ln:'#a6d9d0'},
+lav:{ac:'#7a5fc7',bb:'#ffffff',tx:'#352b52',ot:'#8a7fa8',ln:'#cfc2f0'},
+dark:{ac:'#3a6aa8',bb:'#2a3040',tx:'#e6ecf5',ot:'#9aa6bd',ln:'#3a4256'},
+paper:{ac:'#8b5e34',bb:'#ffffff',tx:'#3d3022',ot:'#8f7d63',ln:'#d0bd96'},
+mono:{ac:'#333333',bb:'#ffffff',tx:'#222222',ot:'#888888',ln:'#cccccc'}};
+const PN={nate:'네이트온',pink:'핑크',mint:'민트',lav:'라벤더',dark:'다크',paper:'종이',mono:'미니멀'};
+const D=Object.assign({id:'ooc',bubble:'round',dash:false,hs:'tab',chip:'OOC',showNo:true,start:1,pad:'2',btn:'fill',btnT:'복사',al:'right',width:460,fs:13,font:'pre',link:false,pvbg:'#ffffff',imgw:'800',cur:0,
+topics:[
+{title:'다음 스레드 시작 장소 정하기',sub:'',open:true,body:'(OOC) 다음 장면은 어디서 시작할까요?\n카페나 비 오는 거리 중에서 골라 주세요!'},
+{title:'설정 질문',sub:'인물 직업 설정 변경',open:true,body:'(OOC) 혹시 그 인물 직업을 사서로 바꿔도 될까요?\n**좋다고 하시면** 제가 맞춰서 쓸게요.'}
+]},PRE.nate);
+let s=JSON.parse(JSON.stringify(D)),IM={},warned=false;
+try{const sv=JSON.parse(localStorage.getItem('bblog4')||'{}');if(sv.ver!==5&&sv.bb&&sv.bb!=='#2a3040')sv.bb='#ffffff';sv.ver=5;Object.assign(s,sv)}catch(e){}
+try{IM=JSON.parse(localStorage.getItem('bblogim')||'{}')}catch(e){}
+if(!Array.isArray(s.topics)||!s.topics.length)s.topics=JSON.parse(JSON.stringify(D.topics));
+if(!(s.cur>=0&&s.cur<s.topics.length))s.cur=0;
+
+const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const il=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/==(.+?)==/g,'<mark>$1</mark>').replace(/~~(.+?)~~/g,'<s>$1</s>').replace(/\*(.+?)\*/g,'<em>$1</em>')
+ .replace(/\[이미지 (\S+?)\]/g,(a,n)=>IM[n]?'<img class="c-img" src="'+IM[n]+'" alt="">':'').replace(/\n/g,'<br>');
+/* 게시판에 올라가는 복사 버튼 동작 (말풍선 글자를 클립보드로) */
+const OC=`var e=this,t=e.parentNode.previousElementSibling.innerText,o=e.textContent,d=function(){e.textContent='복사됨!';setTimeout(function(){e.textContent=o},1500)},f=function(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(x){}document.body.removeChild(a);d()};if(navigator.clipboard){navigator.clipboard.writeText(t).then(d,f)}else{f()}`;
+
+function topicHtml(t,i){
+ const lab=(s.chip||'')+(s.chip&&s.showNo?' ':'')+(s.showNo?String(i+(isNaN(parseInt(s.start))?1:parseInt(s.start))).padStart(+s.pad||2,'0'):'');
+ const head=(lab?'<span class="o-c">'+esc(lab)+'</span>':'')+'<span class="o-tt">'+esc(t.title||'')+'</span>';
+ const sub=t.sub?'<div class="o-s">'+esc(t.sub)+'</div>':'';
+ const body='<div class="c-b">'+il(String(t.body||'').trim())+'</div><div class="c-x"><button type="button" onclick="'+OC+'">'+esc(s.btnT||'복사')+'</button></div>';
+ if(s.hs=='fold')return '<details class="o-t"'+(t.open?' open':'')+'><summary class="o-h">'+head+'</summary>'+sub+body+'</details>';
+ return '<div class="o-t">'+(lab||t.title?'<div class="o-h">'+head+'</div>':'')+sub+body+'</div>'}
+
+function gen(only){
+ const P=(s.id||'').replace(/[^\w-]/g,'')||'ooc',br=({round:16,pill:26,square:4})[s.bubble]||16;
+ const HS={
+  tab:'\n§ .o-h::after{content:"";flex:1;border-top:1px solid var(--ln)}',
+  fold:'\n§ summary.o-h{cursor:pointer;list-style:none}\n§ summary.o-h::-webkit-details-marker{display:none}\n§ summary.o-h::before{content:"▸";color:var(--ot);font-size:11px}\n§ details[open]>summary.o-h::before{content:"▾"}\n§ .o-h::after{content:"";flex:1;border-top:1px solid var(--ln)}',
+  under:'\n§ .o-h{padding-bottom:6px;border-bottom:2px solid var(--ac)}',
+  box:'\n§ .o-h{padding:8px 12px;border:1px solid var(--ln);border-radius:6px}',
+  center:'\n§ .o-h{justify-content:center}\n§ .o-h::before,§ .o-h::after{content:"";flex:1;border-top:1px solid var(--ln)}',
+  plain:''}[s.hs]||'';
+ const BT={fill:'background:var(--ac);color:#fff;border:1px solid var(--ac)',line:'background:transparent;color:var(--ac);border:1px solid var(--ac)',text:'background:transparent;color:var(--ac);border:0;text-decoration:underline'}[s.btn]||'';
+ const css=`§{--ac:${s.ac};--ln:${s.ln};--bb:${s.bb};--tx:${s.tx};--ot:${s.ot};all:initial;display:block;box-sizing:border-box;width:100%;max-width:${s.width}px;margin:0 auto;font-family:${FONTS[s.font]};font-size:${s.fs}px;line-height:1.5;color:var(--tx)}
+§ *{box-sizing:border-box;font-family:inherit}
+§ .o-t{display:block;margin:0 0 26px}
+§ .o-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-weight:bold;font-size:1.08em;color:var(--tx)}
+§ .o-c{flex:none;padding:2px 9px;border-radius:10px;background:var(--ac);color:#fff;font-size:11px;font-weight:bold}
+§ .o-s{font-size:11px;color:var(--ot);margin:0 0 8px}${HS}
+§ .c-b{display:block;padding:11px 15px;background:var(--bb);color:var(--tx);border:1px ${s.dash?'dashed':'solid'} var(--ln);border-radius:${br}px;line-height:1.75;word-break:break-word}
+§ .c-x{display:block;margin-top:7px;text-align:${s.al}}
+§ .c-x button{display:inline-block;margin:0;padding:4px 14px;border-radius:14px;font-size:11px;font-weight:bold;cursor:pointer;line-height:1.5;${BT}}
+§ .c-img{display:block;max-width:100%;height:auto;border-radius:4px;margin:4px 0}
+§ b{font-weight:bold}
+§ em{font-style:italic;opacity:.8}
+§ s{color:inherit}
+§ mark{background:rgba(255,214,102,.5);color:inherit;padding:1px 3px;border-radius:2px}`.replace(/§/g,'#'+P);
+ let h='<div id="'+P+'">';
+ s.topics.forEach((t,i)=>{if(only==null||only===i)h+=topicHtml(t,i)});
+ return{css,html:h+'</div>'}}
+
+function build(only){const{css,html}=gen(only);return(s.link?LINK+'\n':'')+'<style>\n'+css+'\n</style>\n\n'+html}
+function render(){const{css,html}=gen(),n=build();
+ $('#tout').value=n;$('#tpv').innerHTML='<style>'+css+'</style>'+html;$('#tpvbox').style.background=s.pvbg;
+ $('#tsize').textContent=n.length+'자'+(n.length>300000?' ⚠ 너무 길어서 게시판이 못 받을 수 있어요. 주제를 나눠 올려 보세요':'');
+ document.querySelectorAll('[data-v]').forEach(e=>e.textContent=s[e.dataset.v]);drawTabs();
+ try{localStorage.setItem('bblog4',JSON.stringify(s))}catch(e){if(!warned){warned=true;toast('이 환경에서는 자동 저장이 안 돼요. 작업 후 바로 코드를 복사해 두세요')}}}
+
+const inp=(k,l)=>'<label class="t-f"><span>'+l+'</span><input data-k="'+k+'"></label>';
+const chk=(k,l)=>'<label class="t-c"><input type="checkbox" data-k="'+k+'"> '+l+'</label>';
+const col=(k,l)=>'<label class="t-f"><span>'+l+'</span><input type="color" data-k="'+k+'"></label>';
+const rng=(k,l,a,b)=>'<label class="t-f"><span>'+l+' <em data-v="'+k+'"></em></span><input type="range" min="'+a+'" max="'+b+'" data-k="'+k+'"></label>';
+const sel=(k,l,o)=>'<label class="t-f"><span>'+l+'</span><select data-k="'+k+'">'+o.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select></label>';
+const sec=(t,c,o)=>'<details class="t-box"'+(o?' open':'')+'><summary>'+t+'</summary><div class="t-in">'+c+'</div></details>';
+$('#tctl').innerHTML=
+ sec('1. 디자인 고르기','<div class="t-pr">'+Object.keys(PRE).map(k=>'<button class="t-b" type="button" data-p="'+k+'"><i style="background:'+PRE[k].ac+'"></i>'+PN[k]+'</button>').join('')+'</div>'
+  +'<div class="t-help">먼저 마음에 드는 색을 누르고, 아래 칸에서 모양이나 색을 바꿔 보세요. 배경은 항상 투명이에요.</div>'
+  +'<div class="t-g2">'+sel('bubble','말풍선 모양',[['round','둥근'],['pill','아주 둥근'],['square','각진']])+sel('hs','주제 제목 모양',[['tab','라벨 + 옆줄'],['fold','접었다 펼치는 제목'],['under','밑줄'],['box','테두리 상자'],['center','가운데 + 양옆 선'],['plain','글자만']])+'</div>'
+  +'<div class="t-g2">'+sel('btn','복사 버튼 모양',[['fill','색 채움'],['line','테두리만'],['text','글자만']])+sel('al','복사 버튼 위치',[['left','왼쪽'],['center','가운데'],['right','오른쪽']])+'</div>'
+  +chk('dash','말풍선 점선 테두리')
+  +'<div class="t-g2">'+col('bb','말풍선 배경')+col('tx','글자색')+col('ln','테두리색')+col('ot','한 줄 설명 글자색')+col('ac','라벨 · 복사 버튼색')+'</div>'
+  +rng('width','가로 폭(px)',300,700)+rng('fs','글자 크기(px)',11,18)+sel('font','글꼴',[['pre','프리텐다드'],['noto','Noto Sans KR'],['sys','시스템 기본'],['ser','명조']]),1)
+ +sec('2. OOC 주제 (여러 개)','<div class="t-g2">'+inp('chip','주제 앞 라벨 (비우면 없음)')+inp('btnT','복사 버튼 글자')+'</div>'
+  +chk('showNo','주제 번호 붙이기 (주제를 추가하면 번호가 자동으로 늘어나요)')
+  +'<div class="t-g2"><label class="t-f"><span>시작 번호 (이어서 올릴 때)</span><input type="number" min="0" data-k="start"></label>'+sel('pad','번호 모양',[['2','01, 02'],['1','1, 2']])+'</div>'
+  +'<div id="ttabs" class="t-tb"></div>'
+  +'<div class="t-tb"><button class="t-b" type="button" data-add="1">+ 주제 추가</button><button class="t-b" type="button" data-mv="-1">↑ 앞으로</button><button class="t-b" type="button" data-mv="1">↓ 뒤로</button><button class="t-b" type="button" data-rmt="1">이 주제 삭제</button></div>'
+  +'<label class="t-f"><span>주제 제목</span><input data-t="title"></label>'
+  +'<label class="t-f"><span>한 줄 설명 (선택)</span><input data-t="sub"></label>'
+  +'<label class="t-c"><input type="checkbox" data-t="open"> 접는 제목일 때 처음부터 펼쳐두기</label>'
+  +'<div class="t-f"><span>말풍선 안에 들어갈 내용 (복사 버튼으로 복사되는 글)</span></div>'
+  +'<div class="t-tb"><button class="t-b" type="button" data-m="**|**"><b>굵게</b></button><button class="t-b" type="button" data-m="*|*"><i>기울임</i></button><button class="t-b" type="button" data-m="==|==">형광펜</button><button class="t-b" type="button" data-m="~~|~~"><s>취소선</s></button></div>'
+  +'<textarea id="tbody" rows="10" data-t="body"></textarea>'
+  +'<div class="t-tb"><button class="t-b" type="button" id="tup">이미지 올리기</button><input type="file" id="tfile" accept="image/*" multiple hidden><select data-k="imgw"><option value="500">최대 가로 500px</option><option value="800">최대 가로 800px</option><option value="1000">최대 가로 1000px</option></select></div><div id="timgs"></div>'
+  +'<div class="t-help">주제 하나가 글 한 덩어리예요: 제목 → 말풍선 → 복사 버튼. 위 버튼으로 주제를 추가하고, 칸을 눌러 골라서 내용을 쓰세요.<br>줄바꿈은 쓴 그대로 나와요. **굵게** *기울임* ==형광펜== ~~취소선~~ / 이미지는 [이미지 사진1] 처럼 들어가요.<br>복사 버튼은 말풍선 안의 글씨만 복사해요 (굵게 같은 꾸밈은 빠지고 글자만 복사돼요).</div>',1)
+ +sec('3. 출력 옵션',inp('id','고유 ID (한 글에 여러 개 넣을 땐 서로 다르게)')+chk('link','프리텐다드 불러오는 줄을 코드 맨 위에 포함'));
+
+function bindT(){const t=s.topics[s.cur];document.querySelectorAll('[data-t]').forEach(e=>{const v=t[e.dataset.t];if(e.type=='checkbox')e.checked=!!v;else e.value=v==null?'':v})}
+function drawTabs(){$('#ttabs').innerHTML=s.topics.map((t,i)=>'<button class="t-b'+(i==s.cur?' on':'')+'" type="button" data-tp="'+i+'">'+(i+1)+'. '+esc((t.title||'(제목 없음)').slice(0,10))+'</button>').join('')}
+function bind(){document.querySelectorAll('[data-k]').forEach(e=>{const v=s[e.dataset.k];if(e.type=='checkbox')e.checked=!!v;else e.value=v});$('#tpvbg').value=s.pvbg;bindT();drawIm()}
+function drawIm(){const k=Object.keys(IM);$('#timgs').innerHTML=k.map(n=>'<div class="t-im"><img src="'+IM[n]+'" alt=""><b>'+n+'</b><em>'+Math.round(IM[n].length*.75/1024)+'KB</em><button class="t-b" type="button" data-ins="'+n+'">넣기</button><button class="t-b" type="button" data-del="'+n+'">삭제</button></div>').join('')}
+function saveIm(){try{localStorage.setItem('bblogim',JSON.stringify(IM))}catch(e){toast('이 환경에서는 이미지 자동 저장이 안 돼요 (이번 접속 동안만 유지돼요)')}}
+const load=(f,m)=>new Promise(res=>{const r=new FileReader();r.onerror=()=>res('');r.onload=()=>{const im=new Image();im.onerror=()=>res('');im.onload=()=>{const cw=Math.min(im.width,m),ch=Math.round(im.height*cw/im.width),c=document.createElement('canvas');c.width=cw;c.height=ch;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cw,ch);x.drawImage(im,0,0,cw,ch);res(c.toDataURL('image/jpeg',.85))};im.src=r.result};r.readAsDataURL(f)});
+document.addEventListener('input',e=>{const t=e.target,d=t.dataset||{};
+ if(d.k){s[d.k]=t.type=='checkbox'?t.checked:t.type=='range'?+t.value:t.value;render()}
+ else if(d.t){s.topics[s.cur][d.t]=t.type=='checkbox'?t.checked:t.value;render()}});
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+ if(d.p){Object.assign(s,PRE[d.p]);bind();render()}
+ else if(d.tp!==undefined){s.cur=+d.tp;bindT();render()}
+ else if(d.add){s.topics.push({title:'',sub:'',open:true,body:'(OOC) '});s.cur=s.topics.length-1;bindT();render()}
+ else if(d.mv){const j=s.cur+(+d.mv);if(j<0||j>=s.topics.length)return;const a=s.topics;[a[s.cur],a[j]]=[a[j],a[s.cur]];s.cur=j;render()}
+ else if(d.rmt){if(s.topics.length<2){toast('주제는 최소 1개가 필요해요');return}if(confirm('이 주제를 삭제할까요?')){s.topics.splice(s.cur,1);s.cur=Math.min(s.cur,s.topics.length-1);bindT();render()}}
+ else if(d.ins){wrap('\n[이미지 '+d.ins+']\n','')}
+ else if(d.del){delete IM[d.del];saveIm();drawIm();render()}
+ else if(d.w){$('#tpvw').style.maxWidth=d.w}
+ else if(d.m!==undefined){const i=d.m.lastIndexOf('|');wrap(d.m.slice(0,i),d.m.slice(i+1))}});
+$('#tup').onclick=()=>$('#tfile').click();
+$('#tfile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';
+ for(const f of fs){const u=await load(f,parseInt(s.imgw)||800);if(!u)continue;let n=1;while(IM['사진'+n])n++;IM['사진'+n]=u;saveIm();drawIm();wrap('\n[이미지 사진'+n+']\n','')}
+ toast('올리고 내용에도 넣었어요')};
+$('#tpvbg').onchange=e=>{s.pvbg=e.target.value;render()};
+function wrap(l,r){const t=$('#tbody'),a=t.selectionStart,b=t.selectionEnd,v=t.value;t.value=v.slice(0,a)+l+v.slice(a,b)+r+v.slice(b);t.focus();t.selectionStart=a+l.length;t.selectionEnd=b+l.length;t.dispatchEvent(new Event('input',{bubbles:true}))}
+function toast(m){const t=$('#ttoast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200)}
+async function copy(txt,ok){try{await navigator.clipboard.writeText(txt);toast(ok)}catch(e){const o=$('#tout'),old=o.value;o.value=txt;o.select();try{document.execCommand('copy');toast(ok)}catch(x){toast('코드를 직접 복사해 주세요')}o.value=old}}
+$('#tcopy').onclick=()=>copy(build(),'전체 코드를 복사했어요');
+$('#tcopy1').onclick=()=>copy(build(s.cur),'이 주제만 복사했어요');
+$('#treset').onclick=()=>{if(confirm('설정과 모든 주제를 처음 상태로 되돌릴까요? (올린 이미지는 남아요)')){s=JSON.parse(JSON.stringify(D));bind();render()}};
+$('#ttheme').onclick=()=>{const r=document.documentElement;r.dataset.theme=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))=='dark'?'light':'dark'};
+bind();render();
+</script>
+</body>
+</html>
