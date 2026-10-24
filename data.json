@@ -117,11 +117,11 @@
   ]
  },
  "music": {
-  "url": "",
+  "url": "https://youtu.be/ShxagKy3CHQ?si=8liy6VcOQ8Y4GppS",
   "label": "지금 듣는 음악",
-  "artist": "chanhee yui",
-  "volume": 60,
-  "loop": false,
+  "artist": "싸이월드 BGM",
+  "volume": 19,
+  "loop": true,
   "cover": ""
  },
  "links": [
